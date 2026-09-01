@@ -69,8 +69,8 @@ export function CreateStrategyPage() {
         </Link>
       </div>
 
-      <div className="rounded-xl border border-border bg-card px-5 py-4">
-        <Steps steps={steps} current={step} onStepClick={(index) => setStep(index)} />
+      <div className="overflow-x-auto rounded-xl border border-border bg-card px-5 py-4">
+        <Steps steps={steps} current={step} onStepClick={(index) => setStep(index)} className="min-w-[520px]" />
       </div>
 
       <StepComponent />

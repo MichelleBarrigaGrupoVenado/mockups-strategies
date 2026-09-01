@@ -27,8 +27,8 @@ export function Step2Targeting() {
     .join(' ')
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+    <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="flex min-w-0 flex-col gap-4 rounded-xl border border-border bg-card p-5">
         <div className="flex flex-col gap-1">
           <h2 className="text-lg font-semibold text-foreground">Paso 2 - ¿A quién?</h2>
           <p className="text-sm text-muted-foreground">Define los clientes que quieres alcanzar configurando las reglas de segmentación.</p>
@@ -77,7 +77,7 @@ export function Step2Targeting() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+      <div className="flex min-w-0 flex-col gap-4 rounded-xl border border-border bg-card p-5">
         <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <MapPinned size={16} className="text-muted-foreground" />
           Georreferencia

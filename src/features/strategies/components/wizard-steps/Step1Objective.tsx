@@ -28,8 +28,8 @@ export function Step1Objective() {
         <p className="text-sm text-muted-foreground">Selecciona el objetivo principal de esta estrategia.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-        <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
+      <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
+        <div className="flex min-w-0 flex-col gap-5 rounded-xl border border-border bg-card p-5">
           <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <Users2 size={16} className="text-muted-foreground" />
             Datos Generales

@@ -21,8 +21,8 @@ export function Step3Kpi() {
         <p className="text-sm text-muted-foreground">Selecciona un KPI o Meta.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
-        <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
+      <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
+        <div className="flex min-w-0 flex-col gap-5 rounded-xl border border-border bg-card p-5">
           <FieldGroup>
             <Field>
               <FieldLabel>KPI Principal</FieldLabel>
