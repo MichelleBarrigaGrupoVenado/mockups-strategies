@@ -1,0 +1,122 @@
+import { MapPinned, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useTargetClients } from '@/features/strategies/api/useStrategies'
+import { ConditionRow } from '@/features/strategies/components/ConditionRow'
+import { MapPreview } from '@/features/strategies/components/MapPreview'
+import { useWizardStore } from '@/features/strategies/store/useWizardStore'
+import { ConditionJoin, ConditionOperator } from '@/features/strategies/types'
+import { formatBs, formatDate } from '@/shared/utils/format'
+
+const operatorLabels: Record<ConditionOperator, string> = {
+  [ConditionOperator.GreaterThan]: '>',
+  [ConditionOperator.LessThan]: '<',
+  [ConditionOperator.Equals]: '=',
+}
+
+export function Step2Targeting() {
+  const { data, addCondition, removeCondition, updateCondition } = useWizardStore()
+  const { data: clients } = useTargetClients(data.conditions.length)
+
+  const summary = data.conditions
+    .map((c, i) => {
+      const text = `${c.field} ${operatorLabels[c.operator]} ${c.value || '…'}`
+      return i === 0 ? text : `${c.join ?? ConditionJoin.And} ${text}`
+    })
+    .join(' ')
+
+  return (
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-lg font-semibold text-foreground">Paso 2 - ¿A quién?</h2>
+          <p className="text-sm text-muted-foreground">Define los clientes que quieres alcanzar configurando las reglas de segmentación.</p>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          {data.conditions.map((condition, index) => (
+            <div key={condition.id} className="flex flex-col gap-2">
+              {index > 0 && (
+                <div className="flex items-center gap-2 pl-1">
+                  <Button
+                    type="button"
+                    size="xs"
+                    variant={condition.join === ConditionJoin.Or ? 'ghost' : 'secondary'}
+                    onClick={() => updateCondition(condition.id, { join: ConditionJoin.And })}
+                  >
+                    AND
+                  </Button>
+                  <Button
+                    type="button"
+                    size="xs"
+                    variant={condition.join === ConditionJoin.Or ? 'secondary' : 'ghost'}
+                    onClick={() => updateCondition(condition.id, { join: ConditionJoin.Or })}
+                  >
+                    OR
+                  </Button>
+                </div>
+              )}
+              <ConditionRow
+                condition={condition}
+                onChange={(patch) => updateCondition(condition.id, patch)}
+                onRemove={() => removeCondition(condition.id)}
+              />
+            </div>
+          ))}
+        </div>
+
+        <Button variant="ghost" className="w-fit text-primary hover:text-primary" onClick={addCondition}>
+          <Plus data-icon="inline-start" />
+          Agregar condición
+        </Button>
+
+        <div className="rounded-lg bg-muted px-3 py-2.5 text-xs text-muted-foreground">
+          <span className="font-semibold text-foreground">Query Summary: </span>
+          {summary || 'Agrega al menos una condición'}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+          <MapPinned size={16} className="text-muted-foreground" />
+          Georreferencia
+        </div>
+        <p className="-mt-2 text-sm text-muted-foreground">
+          Visualización del segmento de clientes que cumplen las condiciones. Puede seleccionar un grupo específico que cumpla la condición
+        </p>
+
+        <MapPreview focusClient={clients?.[0]} />
+
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-foreground">Clientes en el mapa</span>
+          <Badge variant="secondary">{clients?.length ?? 0} clientes</Badge>
+        </div>
+
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Cliente</TableHead>
+              <TableHead>Ticket prom.</TableHead>
+              <TableHead>Última compra</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {clients?.map((client, i) => (
+              <TableRow key={client.id}>
+                <TableCell className="font-medium text-foreground">
+                  {i === 0 && <span className="mr-1.5 inline-block size-1.5 rounded-full bg-primary align-middle" />}
+                  {client.name}
+                </TableCell>
+                <TableCell>{formatBs(client.ticketPromedio)}</TableCell>
+                <TableCell>{formatDate(client.ultimaCompra)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        <Button className="w-full">Seleccionar grupo de clientes</Button>
+      </div>
+    </div>
+  )
+}
