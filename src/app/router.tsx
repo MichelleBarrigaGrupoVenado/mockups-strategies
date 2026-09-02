@@ -1,5 +1,4 @@
 import {
-  BarChart3,
   FileText,
   FlaskConical,
   Gauge,
@@ -12,6 +11,8 @@ import {
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/app/layout/AppLayout'
 import { PlaceholderPage } from '@/app/pages/PlaceholderPage'
+import { ResultDetailPage } from '@/features/results/pages/ResultDetailPage'
+import { ResultsListPage } from '@/features/results/pages/ResultsListPage'
 import { CreateStrategyPage } from '@/features/strategies/pages/CreateStrategyPage'
 import { StrategiesListPage } from '@/features/strategies/pages/StrategiesListPage'
 import { StrategyDetailPage } from '@/features/strategies/pages/StrategyDetailPage'
@@ -70,16 +71,10 @@ export function AppRouter() {
             />
           }
         />
-        <Route
-          path="resultados"
-          element={
-            <PlaceholderPage
-              icon={BarChart3}
-              title="Resultados"
-              description="Resultados consolidados de todas tus estrategias activas."
-            />
-          }
-        />
+        <Route path="resultados">
+          <Route index element={<ResultsListPage />} />
+          <Route path=":id" element={<ResultDetailPage />} />
+        </Route>
         <Route path="venado-money" element={<VenadoMoneyPage />} />
         <Route
           path="kpis"

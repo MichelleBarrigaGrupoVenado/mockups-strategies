@@ -24,8 +24,34 @@ export function ItemVisual({ item, className }: { item: PointsItem; className?: 
   const Icon = visual.icon
 
   return (
-    <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-lg', visual.className, className)}>
-      <Icon size={17} strokeWidth={2} />
+    <span
+      className={cn(
+        'flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg',
+        !item.imageUrl && visual.className,
+        className,
+      )}
+    >
+      {item.imageUrl ? (
+        <img
+          src={item.imageUrl}
+          alt={item.name}
+          className="size-full object-cover"
+          onError={(event) => {
+            event.currentTarget.style.display = 'none'
+            event.currentTarget.nextElementSibling?.classList.remove('hidden')
+          }}
+        />
+      ) : null}
+
+      <span
+        className={cn(
+          'size-full items-center justify-center',
+          item.imageUrl ? 'hidden' : 'flex',
+          visual.className,
+        )}
+      >
+        <Icon size={17} strokeWidth={2} />
+      </span>
     </span>
   )
 }
