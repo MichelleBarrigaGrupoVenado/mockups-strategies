@@ -11,7 +11,13 @@ import { formatBs, formatDate } from '@/shared/utils/format'
 
 export function Step3Kpi() {
   const { data, update } = useWizardStore()
-  const { data: clients } = useTargetClients(data.conditions.length)
+  const { data: clients } = useTargetClients({
+    city: data.city,
+    channel: data.channel,
+    subchannel: data.subchannel,
+    conditions: data.conditions,
+    selectedClientIds: data.selectedClientIds,
+  })
   const [showTip, setShowTip] = useState(true)
 
   return (

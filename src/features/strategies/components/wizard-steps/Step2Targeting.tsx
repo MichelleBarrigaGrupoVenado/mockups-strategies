@@ -1,10 +1,12 @@
-import { MapPinned, Plus } from 'lucide-react'
+import { MapPinned, Plus, X } from 'lucide-react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useTargetClients } from '@/features/strategies/api/useStrategies'
 import { ConditionRow } from '@/features/strategies/components/ConditionRow'
-import { MapPreview } from '@/features/strategies/components/MapPreview'
+import { ClientsMap } from '@/features/strategies/components/map/ClientsMap'
+import { SelectClientsMapDialog } from '@/features/strategies/components/map/SelectClientsMapDialog'
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
 import { ConditionJoin, ConditionOperator } from '@/features/strategies/types'
 import { formatBs, formatDate } from '@/shared/utils/format'
@@ -16,8 +18,14 @@ const operatorLabels: Record<ConditionOperator, string> = {
 }
 
 export function Step2Targeting() {
-  const { data, addCondition, removeCondition, updateCondition } = useWizardStore()
-  const { data: clients } = useTargetClients(data.conditions.length)
+  const { data, addCondition, removeCondition, updateCondition, update } = useWizardStore()
+  const [mapDialogOpen, setMapDialogOpen] = useState(false)
+
+  const baseFilters = { city: data.city, channel: data.channel, subchannel: data.subchannel, conditions: data.conditions }
+  const { data: candidatePool } = useTargetClients(baseFilters)
+  const { data: displayedClients } = useTargetClients({ ...baseFilters, selectedClientIds: data.selectedClientIds })
+
+  const hasManualSelection = !!data.selectedClientIds
 
   const summary = data.conditions
     .map((c, i) => {
@@ -83,14 +91,25 @@ export function Step2Targeting() {
           Georreferencia
         </div>
         <p className="-mt-2 text-sm text-muted-foreground">
-          Visualización del segmento de clientes que cumplen las condiciones. Puede seleccionar un grupo específico que cumpla la condición
+          Clientes que cumplen la ciudad, canal, subcanal y condiciones definidas. Dibuja un polígono en el mapa para elegir un grupo específico a
+          mano.
         </p>
 
-        <MapPreview focusClient={clients?.[0]} />
+        <ClientsMap clients={displayedClients ?? []} className="h-52 w-full overflow-hidden rounded-lg ring-1 ring-border" />
+
+        {hasManualSelection && (
+          <div className="flex items-center justify-between rounded-lg bg-primary/10 px-3 py-2 text-xs text-primary">
+            <span>Grupo seleccionado a mano en el mapa</span>
+            <button type="button" className="flex items-center gap-1 font-semibold hover:underline" onClick={() => update({ selectedClientIds: null })}>
+              <X size={12} />
+              Quitar selección
+            </button>
+          </div>
+        )}
 
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-foreground">Clientes en el mapa</span>
-          <Badge variant="secondary">{clients?.length ?? 0} clientes</Badge>
+          <Badge variant="secondary">{displayedClients?.length ?? 0} clientes</Badge>
         </div>
 
         <Table>
@@ -102,7 +121,7 @@ export function Step2Targeting() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {clients?.map((client, i) => (
+            {displayedClients?.map((client, i) => (
               <TableRow key={client.id}>
                 <TableCell className="font-medium text-foreground">
                   {i === 0 && <span className="mr-1.5 inline-block size-1.5 rounded-full bg-primary align-middle" />}
@@ -115,8 +134,17 @@ export function Step2Targeting() {
           </TableBody>
         </Table>
 
-        <Button className="w-full">Seleccionar grupo de clientes</Button>
+        <Button className="w-full" onClick={() => setMapDialogOpen(true)}>
+          Seleccionar grupo de clientes
+        </Button>
       </div>
+
+      <SelectClientsMapDialog
+        open={mapDialogOpen}
+        onOpenChange={setMapDialogOpen}
+        candidates={candidatePool ?? []}
+        onConfirm={(clientIds) => update({ selectedClientIds: clientIds })}
+      />
     </div>
   )
 }

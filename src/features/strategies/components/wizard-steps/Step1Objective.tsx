@@ -1,11 +1,12 @@
-import { MapPinned, Package, Recycle, ShoppingCart, UserPlus, Users2 } from 'lucide-react'
+import { ArrowRight, MapPinned, Package, Recycle, ShoppingCart, UserPlus, Users2 } from 'lucide-react'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { IconOptionCard } from '@/features/strategies/components/IconOptionCard'
-import { VennDiagram } from '@/features/strategies/components/VennDiagram'
+import { ProductLevelField } from '@/features/strategies/components/ProductLevelField'
+import { channelOptions, cityOptions, subChannelOptionsByChannel } from '@/features/strategies/data/criteria'
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
 import { StrategyObjective } from '@/features/strategies/types'
 
@@ -17,8 +18,79 @@ const objectiveOptions = [
   { value: StrategyObjective.Other, icon: MapPinned, title: 'Otro', description: 'Definir un objetivo personalizado para esta campaña.' },
 ]
 
+function ProductSegmentSection({ objective }: { objective: StrategyObjective | null }) {
+  const { data, update } = useWizardStore()
+
+  if (objective === StrategyObjective.NewCustomers) {
+    return (
+      <p className="rounded-lg bg-muted px-3 py-2.5 text-sm text-muted-foreground">
+        Este objetivo busca prospectos sin historial de compra, así que no aplica un segmento de productos.
+      </p>
+    )
+  }
+
+  if (objective === StrategyObjective.IncreasePortfolio) {
+    return (
+      <div className="flex flex-col gap-4">
+        <p className="text-sm text-muted-foreground">
+          Elige el producto que el cliente ya compra (A) y el producto al que quieres que se cambie o sume (B). La estrategia buscará
+          clientes que compran A pero todavía no compran B.
+        </p>
+
+        <FieldGroup className="gap-3 rounded-lg border border-border p-3">
+          <span className="text-xs font-semibold text-primary uppercase">Producto A — que ya compran</span>
+          <ProductLevelField
+            levelLabel="Nivel de producto A"
+            valueLabel="Buscar producto A"
+            level={data.productLevelA}
+            value={data.productLevelValueA}
+            onLevelChange={(level) => update({ productLevelA: level })}
+            onValueChange={(value) => update({ productLevelValueA: value })}
+          />
+        </FieldGroup>
+
+        <div className="flex items-center justify-center text-muted-foreground">
+          <ArrowRight size={16} />
+        </div>
+
+        <FieldGroup className="gap-3 rounded-lg border border-border p-3">
+          <span className="text-xs font-semibold text-primary uppercase">Producto B — que queremos que compren</span>
+          <ProductLevelField
+            levelLabel="Nivel de producto B"
+            valueLabel="Buscar producto B"
+            level={data.productLevelB}
+            value={data.productLevelValueB}
+            onLevelChange={(level) => update({ productLevelB: level })}
+            onValueChange={(value) => update({ productLevelValueB: value })}
+          />
+        </FieldGroup>
+      </div>
+    )
+  }
+
+  const labelByObjective: Partial<Record<StrategyObjective, string>> = {
+    [StrategyObjective.RecoverCustomers]: 'Producto que dejaron de comprar',
+    [StrategyObjective.IncreaseTicket]: 'Producto a impulsar',
+    [StrategyObjective.Other]: 'Producto relacionado',
+  }
+
+  return (
+    <FieldGroup className="gap-3">
+      <ProductLevelField
+        levelLabel="Seleccionar nivel de productos"
+        valueLabel={objective ? (labelByObjective[objective] ?? 'Buscar producto') : 'Buscar producto'}
+        level={data.productLevel}
+        value={data.productLevelValue}
+        onLevelChange={(level) => update({ productLevel: level })}
+        onValueChange={(value) => update({ productLevelValue: value })}
+      />
+    </FieldGroup>
+  )
+}
+
 export function Step1Objective() {
   const { data, update } = useWizardStore()
+  const subChannelOptions = data.channel ? (subChannelOptionsByChannel[data.channel] ?? []) : []
 
   return (
     <div className="flex flex-col gap-6">
@@ -55,33 +127,11 @@ export function Step1Objective() {
           <Separator />
 
           <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-            <Users2 size={16} className="text-muted-foreground" />
+            <Package size={16} className="text-muted-foreground" />
             Segmento de Productos
           </div>
 
-          <div className="relative">
-            <VennDiagram className="pointer-events-none absolute inset-x-4 top-0 h-16 w-auto text-muted-foreground/15" />
-            <FieldGroup className="relative gap-3">
-              <Field>
-                <FieldLabel>Seleccionar nivel de productos</FieldLabel>
-                <NativeSelect value={data.productLevel} onChange={(e) => update({ productLevel: e.target.value })}>
-                  <NativeSelectOption value="">Seleccionar Valor</NativeSelectOption>
-                  <NativeSelectOption value="categoria">Categoría</NativeSelectOption>
-                  <NativeSelectOption value="marca">Marca</NativeSelectOption>
-                  <NativeSelectOption value="sku">SKU</NativeSelectOption>
-                </NativeSelect>
-              </Field>
-              <Field>
-                <FieldLabel>Seleccionar valor del nivel de productos</FieldLabel>
-                <NativeSelect value={data.productLevelValue} onChange={(e) => update({ productLevelValue: e.target.value })}>
-                  <NativeSelectOption value="">Seleccionar Valor</NativeSelectOption>
-                  <NativeSelectOption value="bebidas">Bebidas</NativeSelectOption>
-                  <NativeSelectOption value="lacteos">Lácteos</NativeSelectOption>
-                  <NativeSelectOption value="limpieza">Limpieza</NativeSelectOption>
-                </NativeSelect>
-              </Field>
-            </FieldGroup>
-          </div>
+          <ProductSegmentSection objective={data.objective} />
 
           <Separator />
 
@@ -95,18 +145,36 @@ export function Step1Objective() {
               <FieldLabel>Seleccionar Ciudad</FieldLabel>
               <NativeSelect value={data.city} onChange={(e) => update({ city: e.target.value })}>
                 <NativeSelectOption value="">Seleccionar Ciudad</NativeSelectOption>
-                <NativeSelectOption value="santa-cruz">Santa Cruz</NativeSelectOption>
-                <NativeSelectOption value="la-paz">La Paz</NativeSelectOption>
-                <NativeSelectOption value="cochabamba">Cochabamba</NativeSelectOption>
+                {cityOptions.map((option) => (
+                  <NativeSelectOption key={option.value} value={option.value}>
+                    {option.label}
+                  </NativeSelectOption>
+                ))}
               </NativeSelect>
             </Field>
             <Field>
               <FieldLabel>Seleccionar Canal</FieldLabel>
-              <NativeSelect value={data.channel} onChange={(e) => update({ channel: e.target.value })}>
+              <NativeSelect
+                value={data.channel}
+                onChange={(e) => update({ channel: e.target.value, subchannel: '' })}
+              >
                 <NativeSelectOption value="">Seleccionar Canal</NativeSelectOption>
-                <NativeSelectOption value="moderno">Moderno</NativeSelectOption>
-                <NativeSelectOption value="tradicional">Tradicional</NativeSelectOption>
-                <NativeSelectOption value="mayorista">Mayorista</NativeSelectOption>
+                {channelOptions.map((option) => (
+                  <NativeSelectOption key={option.value} value={option.value}>
+                    {option.label}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            </Field>
+            <Field>
+              <FieldLabel>Seleccionar Subcanal</FieldLabel>
+              <NativeSelect value={data.subchannel} disabled={!data.channel} onChange={(e) => update({ subchannel: e.target.value })}>
+                <NativeSelectOption value="">{data.channel ? 'Seleccionar Subcanal' : 'Elige un canal primero'}</NativeSelectOption>
+                {subChannelOptions.map((option) => (
+                  <NativeSelectOption key={option.value} value={option.value}>
+                    {option.label}
+                  </NativeSelectOption>
+                ))}
               </NativeSelect>
             </Field>
           </FieldGroup>

@@ -54,6 +54,11 @@ export interface TargetClient {
   ultimaVisita?: string
   metaMin?: number
   metaMax?: number
+  lat: number
+  lng: number
+  city: string
+  channel: string
+  subchannel: string
 }
 
 export interface PointsRule {
@@ -74,13 +79,16 @@ export interface StrategyWizardData {
   description: string
   productLevel: string
   productLevelValue: string
-  productLevelA?: string
-  productLevelValueA?: string
-  productLevelB?: string
-  productLevelValueB?: string
+  productLevelA: string
+  productLevelValueA: string
+  productLevelB: string
+  productLevelValueB: string
   city: string
   channel: string
+  subchannel: string
   conditions: TargetingCondition[]
+  /** Ids de clientes elegidos a mano dibujando un polígono en el mapa. null = usar el filtro automático. */
+  selectedClientIds: string[] | null
   kpiPrincipal: string
   metaMinPercent: number
   metaMaxPercent: number
