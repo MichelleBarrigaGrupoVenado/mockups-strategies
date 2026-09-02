@@ -1,4 +1,4 @@
-import { MapPin, MoreHorizontal, Package, ShoppingCart, Sparkles, Tags, ThumbsUp } from 'lucide-react'
+import { MapPin, MoreHorizontal, Package, ShoppingCart, Tags, ThumbsUp } from 'lucide-react'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
 import { IconOptionCard } from '@/features/strategies/components/IconOptionCard'

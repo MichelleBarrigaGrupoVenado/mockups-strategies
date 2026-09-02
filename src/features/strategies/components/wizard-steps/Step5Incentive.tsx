@@ -533,6 +533,9 @@ export function Step5Incentive() {
                 <RadioGroupItem value="con-vencimiento" />
                 Con fecha de vencimiento
               </Label>
+              {data.pointsExpire && (
+                <div>date</div>
+              )}
             </RadioGroup>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { BarChart3, X } from 'lucide-react'
+import { BarChart3 } from 'lucide-react'
 import { useState } from 'react'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'

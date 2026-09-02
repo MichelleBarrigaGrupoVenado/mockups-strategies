@@ -123,3 +123,12 @@ export function getProductOptions(level: ProductLevel | ''): { value: string; la
   if (!level) return []
   return dataByLevel[level].map((item) => ({ value: item.id, label: item.name }))
 }
+
+/** Breadcrumb "Grupo / Familia" de un producto del nivel final, para mostrarlo como referencia al seleccionarlo. */
+export function getProductBreadcrumb(productId: string): string {
+  const product = products.find((item) => item.id === productId)
+  if (!product) return ''
+  const family = families.find((item) => item.id === product.parentId)
+  const group = family ? groups.find((item) => item.id === family.parentId) : undefined
+  return [group?.name, family?.name].filter(Boolean).join(' / ')
+}

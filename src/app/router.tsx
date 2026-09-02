@@ -8,7 +8,6 @@ import {
   Settings,
   User,
   Users,
-  Wallet,
 } from 'lucide-react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/app/layout/AppLayout'
@@ -16,6 +15,7 @@ import { PlaceholderPage } from '@/app/pages/PlaceholderPage'
 import { CreateStrategyPage } from '@/features/strategies/pages/CreateStrategyPage'
 import { StrategiesListPage } from '@/features/strategies/pages/StrategiesListPage'
 import { StrategyDetailPage } from '@/features/strategies/pages/StrategyDetailPage'
+import { VenadoMoneyPage } from '@/features/venado-money/pages/VenadoMoneyPage'
 
 export function AppRouter() {
   return (
@@ -80,16 +80,7 @@ export function AppRouter() {
             />
           }
         />
-        <Route
-          path="venado-money"
-          element={
-            <PlaceholderPage
-              icon={Wallet}
-              title="Venado Money"
-              description="Administra los incentivos y el saldo entregado a clientes y empleados."
-            />
-          }
-        />
+        <Route path="venado-money" element={<VenadoMoneyPage />} />
         <Route
           path="kpis"
           element={
