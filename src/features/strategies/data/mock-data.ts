@@ -9,7 +9,7 @@ export const cityCenters: Record<string, { lat: number; lng: number }> = {
 
 export const mockTargetClients: TargetClient[] = [
   { id: 'c1', name: 'María López', ticketPromedio: 1250, ultimaCompra: '2026-08-15', metaMin: 1375, metaMax: 1500, lat: -17.7699, lng: -63.1955, city: 'santa-cruz', channel: 'moderno', subchannel: 'supermercado' },
-  { id: 'c2', name: 'Carlos Mendoza', ticketPromedio: 980, ultimaCompra: '2026-08-12', ultimaVisita: '2026-08-12', metaMin: 1020, metaMax: 1100, lat: -17.7912, lng: -63.1687, city: 'santa-cruz', channel: 'tradicional', subchannel: 'abarrote' },
+  { id: 'c2', name: 'Carlos Mendoza', ticketPromedio: 980, ultimaCompra: '2026-08-12', ultimaVisita: '2026-08-12', metaMin: 1020, metaMax: 1100, lat: -17.7912, lng: -63.1687, city: 'santa-cruz', channel: 'tradicional', subchannel: 'restaurante' },
   { id: 'c3', name: 'Ana Gutiérrez', ticketPromedio: 2100, ultimaCompra: '2026-08-10', ultimaVisita: '2026-08-10', metaMin: 2310, metaMax: 2400, lat: -17.7591, lng: -63.1743, city: 'santa-cruz', channel: 'moderno', subchannel: 'hipermercado' },
   { id: 'c4', name: 'José Ramírez', ticketPromedio: 750, ultimaCompra: '2026-08-08', ultimaVisita: '2026-08-08', metaMin: 830, metaMax: 900, lat: -17.8046, lng: -63.1956, city: 'santa-cruz', channel: 'tradicional', subchannel: 'mercado-municipal' },
   { id: 'c5', name: 'Laura Fernández', ticketPromedio: 1500, ultimaCompra: '2026-08-05', ultimaVisita: '2026-08-05', metaMin: 1650, metaMax: 1700, lat: -17.7734, lng: -63.2043, city: 'santa-cruz', channel: 'moderno', subchannel: 'tienda-conveniencia' },
@@ -23,11 +23,22 @@ export const mockTargetClients: TargetClient[] = [
   { id: 'c13', name: 'Camila Flores', ticketPromedio: 1410, ultimaCompra: '2026-08-16', ultimaVisita: '2026-08-16', metaMin: 1540, metaMax: 1640, lat: -16.4738, lng: -68.1567, city: 'la-paz', channel: 'mayorista', subchannel: 'cash-and-carry' },
   { id: 'c14', name: 'Fernando Apaza', ticketPromedio: 700, ultimaCompra: '2026-08-03', ultimaVisita: '2026-08-03', metaMin: 770, metaMax: 830, lat: -16.5051, lng: -68.1789, city: 'la-paz', channel: 'tradicional', subchannel: 'kiosko' },
   { id: 'c15', name: 'Gabriela Colque', ticketPromedio: 1290, ultimaCompra: '2026-08-02', ultimaVisita: '2026-08-02', metaMin: 1410, metaMax: 1500, lat: -17.3721, lng: -66.1423, city: 'cochabamba', channel: 'moderno', subchannel: 'supermercado' },
-  { id: 'c16', name: 'Hugo Terrazas', ticketPromedio: 1050, ultimaCompra: '2026-08-17', ultimaVisita: '2026-08-17', metaMin: 1150, metaMax: 1230, lat: -17.4023, lng: -66.1712, city: 'cochabamba', channel: 'tradicional', subchannel: 'abarrote' },
+  { id: 'c16', name: 'Hugo Terrazas', ticketPromedio: 1050, ultimaCompra: '2026-08-17', ultimaVisita: '2026-08-17', metaMin: 1150, metaMax: 1230, lat: -17.4023, lng: -66.1712, city: 'cochabamba', channel: 'tradicional', subchannel: 'restaurante' },
   { id: 'c17', name: 'Lucía Rocha', ticketPromedio: 1880, ultimaCompra: '2026-08-01', ultimaVisita: '2026-08-01', metaMin: 2050, metaMax: 2180, lat: -17.3654, lng: -66.1834, city: 'cochabamba', channel: 'moderno', subchannel: 'hipermercado' },
   { id: 'c18', name: 'Ricardo Salazar', ticketPromedio: 830, ultimaCompra: '2026-07-30', ultimaVisita: '2026-07-30', metaMin: 900, metaMax: 970, lat: -17.4189, lng: -66.1301, city: 'cochabamba', channel: 'tradicional', subchannel: 'licoreria' },
   { id: 'c19', name: 'Daniela Peredo', ticketPromedio: 1560, ultimaCompra: '2026-07-29', ultimaVisita: '2026-07-29', metaMin: 1710, metaMax: 1820, lat: -17.3567, lng: -66.1589, city: 'cochabamba', channel: 'mayorista', subchannel: 'distribuidor' },
   { id: 'c20', name: 'Óscar Vidal', ticketPromedio: 1120, ultimaCompra: '2026-07-28', ultimaVisita: '2026-07-28', metaMin: 1220, metaMax: 1300, lat: -17.3912, lng: -66.1956, city: 'cochabamba', channel: 'moderno', subchannel: 'tienda-conveniencia' },
+  // Nuevos clientes - Canal tradicional - Subcanal mercado
+  { id: 'c21', name: 'Patricia Molina', ticketPromedio: 680, ultimaCompra: '2026-08-18', ultimaVisita: '2026-08-18', metaMin: 750, metaMax: 820, lat: -17.7821, lng: -63.1814, city: 'santa-cruz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c22', name: 'Jorge Salvatierra', ticketPromedio: 920, ultimaCompra: '2026-08-16', ultimaVisita: '2026-08-16', metaMin: 1010, metaMax: 1100, lat: -17.7985, lng: -63.2078, city: 'santa-cruz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c23', name: 'Elena Vargas', ticketPromedio: 1150, ultimaCompra: '2026-08-14', ultimaVisita: '2026-08-14', metaMin: 1260, metaMax: 1350, lat: -17.7584, lng: -63.1865, city: 'santa-cruz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c24', name: 'Marco Antonio Pérez', ticketPromedio: 760, ultimaCompra: '2026-08-13', ultimaVisita: '2026-08-13', metaMin: 830, metaMax: 900, lat: -17.8124, lng: -63.1792, city: 'santa-cruz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c25', name: 'Carmen Rojas', ticketPromedio: 540, ultimaCompra: '2026-08-12', ultimaVisita: '2026-08-12', metaMin: 600, metaMax: 680, lat: -16.5018, lng: -68.1472, city: 'la-paz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c26', name: 'Luis Condori', ticketPromedio: 870, ultimaCompra: '2026-08-10', ultimaVisita: '2026-08-10', metaMin: 960, metaMax: 1050, lat: -16.5186, lng: -68.1308, city: 'la-paz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c27', name: 'Mónica Callisaya', ticketPromedio: 1280, ultimaCompra: '2026-08-09', ultimaVisita: '2026-08-09', metaMin: 1400, metaMax: 1500, lat: -16.4845, lng: -68.1651, city: 'la-paz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c28', name: 'Edwin Huanca', ticketPromedio: 620, ultimaCompra: '2026-08-07', ultimaVisita: '2026-08-07', metaMin: 680, metaMax: 750, lat: -17.3832, lng: -66.1657, city: 'cochabamba', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c29', name: 'Silvia Torrico', ticketPromedio: 990, ultimaCompra: '2026-08-06', ultimaVisita: '2026-08-06', metaMin: 1080, metaMax: 1170, lat: -17.4098, lng: -66.1513, city: 'cochabamba', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c30', name: 'Raúl Fernández', ticketPromedio: 1080, ultimaCompra: '2026-08-04', ultimaVisita: '2026-08-04', metaMin: 1180, metaMax: 1280, lat: -17.3598, lng: -66.1754, city: 'cochabamba', channel: 'tradicional', subchannel: 'mercado-municipal' },
 ]
 
 export const mockStrategySummaries: StrategySummary[] = [

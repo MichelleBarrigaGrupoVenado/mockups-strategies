@@ -1,6 +1,5 @@
 import { BarChart3, X } from 'lucide-react'
 import { useState } from 'react'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
@@ -8,6 +7,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useTargetClients } from '@/features/strategies/api/useStrategies'
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
 import { formatBs, formatDate } from '@/shared/utils/format'
+
+type ClientMetaOverrides = Record<
+  string,
+  {
+    metaMin?: number
+    metaMax?: number
+  }
+>
 
 export function Step3Kpi() {
   const { data, update } = useWizardStore()
@@ -18,7 +25,37 @@ export function Step3Kpi() {
     conditions: data.conditions,
     selectedClientIds: data.selectedClientIds,
   })
-  const [showTip, setShowTip] = useState(true)
+  const [metaOverrides, setMetaOverrides] = useState<ClientMetaOverrides>({})
+
+  const calculateMeta = (ticketPromedio: number, percent: number) => {
+    return ticketPromedio * (1 + percent / 100)
+  }
+
+  const getMetaMin = (client: NonNullable<typeof clients>[number]) => {
+    return metaOverrides[client.id]?.metaMin
+      ?? calculateMeta(client.ticketPromedio, data.metaMinPercent)
+  }
+
+  const getMetaMax = (client: NonNullable<typeof clients>[number]) => {
+    return metaOverrides[client.id]?.metaMax
+      ?? calculateMeta(client.ticketPromedio, data.metaMaxPercent)
+  }
+
+  const updateClientMeta = (
+    clientId: string,
+    field: 'metaMin' | 'metaMax',
+    value: string,
+  ) => {
+    const numericValue = value === '' ? undefined : Number(value)
+
+    setMetaOverrides((prev) => ({
+      ...prev,
+      [clientId]: {
+        ...prev[clientId],
+        [field]: numericValue,
+      },
+    }))
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -88,8 +125,33 @@ export function Step3Kpi() {
                     <TableCell>{formatDate(client.ultimaCompra)}</TableCell>
                     <TableCell>{client.ultimaVisita ? formatDate(client.ultimaVisita) : '—'}</TableCell>
                     <TableCell>{formatBs(client.ticketPromedio)}</TableCell>
-                    <TableCell>{client.metaMin ? formatBs(client.metaMin) : '—'}</TableCell>
-                    <TableCell>{client.metaMax ? formatBs(client.metaMax) : '—'}</TableCell>
+                    <TableCell>
+                      <InputGroup className="w-32">
+                        <InputGroupAddon align="inline-start">Bs</InputGroupAddon>
+                        <InputGroupInput
+                          type="number"
+                          min="0"
+                          value={getMetaMin(client)}
+                          onChange={(e) =>
+                            updateClientMeta(client.id, 'metaMin', e.target.value)
+                          }
+                        />
+                      </InputGroup>
+                    </TableCell>
+
+                    <TableCell>
+                      <InputGroup className="w-32">
+                        <InputGroupAddon align="inline-start">Bs</InputGroupAddon>
+                        <InputGroupInput
+                          type="number"
+                          min="0"
+                          value={getMetaMax(client)}
+                          onChange={(e) =>
+                            updateClientMeta(client.id, 'metaMax', e.target.value)
+                          }
+                        />
+                      </InputGroup>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -111,20 +173,6 @@ export function Step3Kpi() {
               <span className="rounded-md bg-primary px-2 py-1.5 font-medium text-primary-foreground">Nuevo Ticket</span>
             </div>
           </div>
-
-          {showTip && (
-            <div className="relative flex items-start gap-2 rounded-xl rounded-tr-sm bg-foreground p-3 text-xs text-background shadow-lg">
-              <Avatar className="size-6 shrink-0">
-                <AvatarFallback className="bg-pink-500 text-[10px] text-white">M</AvatarFallback>
-              </Avatar>
-              <p className="leading-relaxed">
-                <span className="font-semibold">Michelle</span> hace 35 min: campos editables por si se desea añadir un objetivo específico
-              </p>
-              <button type="button" onClick={() => setShowTip(false)} className="absolute top-1.5 right-1.5 text-background/60 hover:text-background">
-                <X size={12} />
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>

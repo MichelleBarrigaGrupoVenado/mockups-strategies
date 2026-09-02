@@ -17,9 +17,10 @@ export const subChannelOptionsByChannel: Record<string, { value: string; label: 
     { value: 'tienda-conveniencia', label: 'Tienda de conveniencia' },
   ],
   tradicional: [
-    { value: 'abarrote', label: 'Abarrote / Pulpería' },
+    { value: 'restaurante', label: 'Restaurante' },
     { value: 'mercado-municipal', label: 'Mercado municipal' },
     { value: 'kiosko', label: 'Kiosko' },
+    { value: 'panaderia', label: 'Panadería' },
     { value: 'licoreria', label: 'Licorería' },
   ],
   mayorista: [
