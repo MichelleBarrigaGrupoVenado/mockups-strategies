@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { ConditionJoin, ConditionOperator, type StrategyWizardData, type TargetingCondition } from '@/features/strategies/types'
+import { ActionType, ConditionJoin, ConditionOperator, type StrategyWizardData, type TargetingCondition } from '@/features/strategies/types'
 
 const initialData: StrategyWizardData = {
   objective: null,
@@ -16,13 +16,14 @@ const initialData: StrategyWizardData = {
   subchannel: '',
   conditions: [
     { id: crypto.randomUUID(), field: 'Ventas históricas', operator: ConditionOperator.GreaterThan, value: '500', join: ConditionJoin.And },
-    { id: crypto.randomUUID(), field: 'Cliente activo', operator: ConditionOperator.Equals, value: 'Sí' },
   ],
   selectedClientIds: null,
   kpiPrincipal: 'Ticket promedio',
   metaMinPercent: 10,
   metaMaxPercent: 20,
-  actionType: null,
+  actionTypes: [
+    ActionType.RecommendProducts,
+  ],
   actionDetail: '',
   clientIncentiveEnabled: true,
   pointsRules: [

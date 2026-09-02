@@ -92,7 +92,7 @@ export interface StrategyWizardData {
   kpiPrincipal: string
   metaMinPercent: number
   metaMaxPercent: number
-  actionType: ActionType | null
+  actionTypes: ActionType[]
   actionDetail: string
   clientIncentiveEnabled: boolean
   pointsRules: PointsRule[]

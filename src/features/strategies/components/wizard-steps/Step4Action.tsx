@@ -17,6 +17,16 @@ const actionOptions = [
 export function Step4Action() {
   const { data, update } = useWizardStore()
 
+  const toggleAction = (action: ActionType) => {
+    const isSelected = data.actionTypes.includes(action)
+
+    update({
+      actionTypes: isSelected
+        ? data.actionTypes.filter((item) => item !== action)
+        : [...data.actionTypes, action],
+    })
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
@@ -31,15 +41,14 @@ export function Step4Action() {
             icon={option.icon}
             title={option.title}
             description={option.description}
-            selected={data.actionType === option.value}
-            onClick={() => update({ actionType: option.value })}
+            selected={data.actionTypes.includes(option.value)}
+            onClick={() => toggleAction(option.value)}
           />
         ))}
       </div>
 
       <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-5">
         <FieldLabel className="flex items-center gap-2 text-sm font-semibold text-foreground">
-          <Sparkles size={15} className="text-muted-foreground" />
           Recomendación detallada
         </FieldLabel>
         <p className="text-sm text-muted-foreground">Redacta la instrucción exacta que recibirá el equipo comercial. Sé específico.</p>

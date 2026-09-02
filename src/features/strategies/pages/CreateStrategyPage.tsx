@@ -35,7 +35,7 @@ export function CreateStrategyPage() {
   const isLastStep = step === steps.length - 1
 
   const canAdvance =
-    step === 0 ? !!data.objective && data.name.trim().length >= 3 : step === 3 ? !!data.actionType && data.actionDetail.trim().length >= 10 : true
+    step === 0 ? !!data.objective && data.name.trim().length >= 3 : step === 3 ? !!data.actionTypes : true
 
   function handleNext() {
     if (!canAdvance) {
