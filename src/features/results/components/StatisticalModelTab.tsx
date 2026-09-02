@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Bar, BarChart, CartesianGrid, ComposedChart, Line, XAxis, YAxis } from 'recharts'
-import { ChartContainer, type ChartConfig } from '@/components/ui/chart'
+import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { StatCard } from '@/features/strategies/components/StatCard'
@@ -55,27 +55,31 @@ export function StatisticalModelTab({ data }: { data: StatisticalModelResult }) 
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
           <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-2">
-              <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Gastos operativos por {columnLabel.toLowerCase()}</span>
-              <ChartContainer config={breakdownChartConfig} className="aspect-auto h-56 w-full">
-                <BarChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="label"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    interval={0}
-                    angle={rotateLabels ? -35 : 0}
-                    textAnchor={rotateLabels ? 'end' : 'middle'}
-                    height={rotateLabels ? 50 : 24}
-                  />
-                  <YAxis hide />
-                  <Bar dataKey="costoBs" stackId="breakdown" fill="var(--color-costoBs)" />
-                  <Bar dataKey="gananciaBs" stackId="breakdown" fill="var(--color-gananciaBs)" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ChartContainer>
-            </div>
+            {view === StatisticalModelView.ByMonth && (
+              <div className="flex flex-col gap-2">
+                <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Gastos operativos por {columnLabel.toLowerCase()}</span>
+                <ChartContainer config={breakdownChartConfig} className="aspect-auto h-56 w-full">
+                  <BarChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="label"
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={8}
+                      interval={0}
+                      angle={rotateLabels ? -35 : 0}
+                      textAnchor={rotateLabels ? 'end' : 'middle'}
+                      height={rotateLabels ? 50 : 24}
+                    />
+                    <YAxis hide />
+                    <ChartTooltip cursor={{ fill: 'hsl(var(--muted))' }} content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Bar dataKey="costoBs" stackId="breakdown" fill="var(--color-costoBs)" />
+                    <Bar dataKey="gananciaBs" stackId="breakdown" fill="var(--color-gananciaBs)" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ChartContainer>
+              </div>
+            )}
 
             <div className="flex flex-col gap-2">
               <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Ventas y ganancia por {columnLabel.toLowerCase()}</span>
@@ -94,8 +98,9 @@ export function StatisticalModelTab({ data }: { data: StatisticalModelResult }) 
                   />
                   <YAxis yAxisId="left" hide />
                   <YAxis yAxisId="right" orientation="right" hide domain={[0, 100]} />
+                  <ChartTooltip cursor={{ fill: 'hsl(var(--muted))' }} content={<ChartTooltipContent />} />
                   <Bar yAxisId="left" dataKey="ventasBs" fill="var(--color-ventasBs)" radius={[4, 4, 0, 0]} maxBarSize={36} />
-                  <Line yAxisId="right" type="monotone" dataKey="gananciaPercent" stroke="var(--color-gananciaPercent)" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line yAxisId="right" type="monotone" dataKey="gananciaPercent" stroke="var(--color-gananciaPercent)" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                 </ComposedChart>
               </ChartContainer>
             </div>
