@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { ActionType, ConditionJoin, ConditionOperator, type StrategyWizardData, type TargetingCondition } from '@/features/strategies/types'
+import { ActionType, ClientIncentiveType, ConditionJoin, ConditionOperator, type StrategyWizardData, type TargetingCondition } from '@/features/strategies/types'
 
 const initialData: StrategyWizardData = {
   objective: null,
@@ -26,10 +26,12 @@ const initialData: StrategyWizardData = {
   ],
   actionDetail: '',
   clientIncentiveEnabled: true,
+  clientIncentiveType: ClientIncentiveType.PurchaseAmount,
   pointsRules: [
     { id: crypto.randomUUID(), amountBs: 100, points: 10 },
     { id: crypto.randomUUID(), amountBs: 200, points: 25 },
   ],
+  productPointsRules: [],
   pointsExpire: false,
   employeeIncentiveEnabled: true,
   complianceRules: [{ id: crypto.randomUUID(), percent: 100, points: 0 }],

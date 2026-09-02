@@ -66,6 +66,31 @@ export interface PointsRule {
   amountBs: number
   points: number
 }
+export const ClientIncentiveType = {
+  PurchaseAmount: 'purchase_amount',
+  Product: 'product',
+} as const
+
+export type ClientIncentiveType =
+  (typeof ClientIncentiveType)[keyof typeof ClientIncentiveType]
+
+export const ProductUnitType = {
+  Unit: 'unit',
+  Package: 'package',
+} as const
+
+export type ProductUnitType =
+  (typeof ProductUnitType)[keyof typeof ProductUnitType]
+
+export interface ProductPointsRule {
+  id: string
+  productId: string
+  productCode: string
+  productName: string
+  unitType: ProductUnitType
+  quantity: number
+  points: number
+}
 
 export interface ComplianceRule {
   id: string
@@ -95,7 +120,9 @@ export interface StrategyWizardData {
   actionTypes: ActionType[]
   actionDetail: string
   clientIncentiveEnabled: boolean
+  clientIncentiveType: ClientIncentiveType
   pointsRules: PointsRule[]
+  productPointsRules: ProductPointsRule[]
   pointsExpire: boolean
   employeeIncentiveEnabled: boolean
   complianceRules: ComplianceRule[]
