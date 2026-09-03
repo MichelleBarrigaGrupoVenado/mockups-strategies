@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { createDefaultCondition } from '@/features/strategies/data/condition-fields'
 import { ActionType, ClientIncentiveType, ConditionJoin, ConditionOperator, type StrategyWizardData, type TargetingCondition } from '@/features/strategies/types'
 
 const initialData: StrategyWizardData = {
@@ -61,10 +62,7 @@ export const useWizardStore = create<WizardState>((set) => ({
     set((s) => ({
       data: {
         ...s.data,
-        conditions: [
-          ...s.data.conditions,
-          { id: crypto.randomUUID(), field: 'Ventas históricas', operator: ConditionOperator.GreaterThan, value: '', join: ConditionJoin.And },
-        ],
+        conditions: [...s.data.conditions, createDefaultCondition(s.data.objective)],
       },
     })),
   removeCondition: (id) => set((s) => ({ data: { ...s.data, conditions: s.data.conditions.filter((c) => c.id !== id) } })),

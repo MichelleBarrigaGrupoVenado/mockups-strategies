@@ -7,7 +7,9 @@ export const cityCenters: Record<string, { lat: number; lng: number }> = {
   cochabamba: { lat: -17.3895, lng: -66.1568 },
 }
 
-export const mockTargetClients: TargetClient[] = [
+type RawTargetClient = Omit<TargetClient, 'mesesUltimaCompra' | 'activo' | 'comproMesActual' | 'visitadoMesActual' | 'deuda' | 'mora'>
+
+const rawTargetClients: RawTargetClient[] = [
   { id: 'c1', name: 'María López', ticketPromedio: 1250, ultimaCompra: '2026-08-15', metaMin: 1375, metaMax: 1500, lat: -17.7699, lng: -63.1955, city: 'santa-cruz', channel: 'moderno', subchannel: 'supermercado' },
   { id: 'c2', name: 'Carlos Mendoza', ticketPromedio: 980, ultimaCompra: '2026-08-12', ultimaVisita: '2026-08-12', metaMin: 1020, metaMax: 1100, lat: -17.7912, lng: -63.1687, city: 'santa-cruz', channel: 'tradicional', subchannel: 'restaurante' },
   { id: 'c3', name: 'Ana Gutiérrez', ticketPromedio: 2100, ultimaCompra: '2026-08-10', ultimaVisita: '2026-08-10', metaMin: 2310, metaMax: 2400, lat: -17.7591, lng: -63.1743, city: 'santa-cruz', channel: 'moderno', subchannel: 'hipermercado' },
@@ -39,7 +41,54 @@ export const mockTargetClients: TargetClient[] = [
   { id: 'c28', name: 'Edwin Huanca', ticketPromedio: 620, ultimaCompra: '2026-08-07', ultimaVisita: '2026-08-07', metaMin: 680, metaMax: 750, lat: -17.3832, lng: -66.1657, city: 'cochabamba', channel: 'tradicional', subchannel: 'mercado-municipal' },
   { id: 'c29', name: 'Silvia Torrico', ticketPromedio: 990, ultimaCompra: '2026-08-06', ultimaVisita: '2026-08-06', metaMin: 1080, metaMax: 1170, lat: -17.4098, lng: -66.1513, city: 'cochabamba', channel: 'tradicional', subchannel: 'mercado-municipal' },
   { id: 'c30', name: 'Raúl Fernández', ticketPromedio: 1080, ultimaCompra: '2026-08-04', ultimaVisita: '2026-08-04', metaMin: 1180, metaMax: 1280, lat: -17.3598, lng: -66.1754, city: 'cochabamba', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  // Santa Cruz — lote adicional con fechas de última compra escalonadas (0 a 30 meses) para poder
+  // probar de verdad los filtros de "Última Compra" (3/6/12 meses) y "Cliente Activo" del wizard.
+  { id: 'c31', name: 'Ivonne Suárez', ticketPromedio: 1420, ultimaCompra: '2026-09-01', ultimaVisita: '2026-09-01', metaMin: 1560, metaMax: 1670, lat: -17.7602, lng: -63.1789, city: 'santa-cruz', channel: 'moderno', subchannel: 'supermercado' },
+  { id: 'c32', name: 'Franz Justiniano', ticketPromedio: 610, ultimaCompra: '2026-09-02', ultimaVisita: '2026-09-02', metaMin: 670, metaMax: 730, lat: -17.7955, lng: -63.1668, city: 'santa-cruz', channel: 'tradicional', subchannel: 'kiosko' },
+  { id: 'c33', name: 'Roxana Áñez', ticketPromedio: 2350, ultimaCompra: '2026-08-05', ultimaVisita: '2026-09-02', metaMin: 2580, metaMax: 2750, lat: -17.7458, lng: -63.2011, city: 'santa-cruz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c34', name: 'Wilson Paz', ticketPromedio: 890, ultimaCompra: '2026-07-10', ultimaVisita: '2026-07-10', metaMin: 970, metaMax: 1050, lat: -17.8072, lng: -63.1901, city: 'santa-cruz', channel: 'tradicional', subchannel: 'restaurante' },
+  { id: 'c35', name: 'Tania Roca', ticketPromedio: 1780, ultimaCompra: '2026-06-03', ultimaVisita: '2026-06-03', metaMin: 1950, metaMax: 2080, lat: -17.7688, lng: -63.2098, city: 'santa-cruz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c36', name: 'Boris Melgar', ticketPromedio: 520, ultimaCompra: '2026-05-15', ultimaVisita: '2026-05-15', metaMin: 570, metaMax: 620, lat: -17.8201, lng: -63.1735, city: 'santa-cruz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c37', name: 'Gimena Rivero', ticketPromedio: 1990, ultimaCompra: '2026-04-20', ultimaVisita: '2026-04-20', metaMin: 2180, metaMax: 2320, lat: -17.7532, lng: -63.1622, city: 'santa-cruz', channel: 'mayorista', subchannel: 'cash-and-carry' },
+  { id: 'c38', name: 'Néstor Landívar', ticketPromedio: 740, ultimaCompra: '2026-03-03', ultimaVisita: '2026-03-03', metaMin: 810, metaMax: 880, lat: -17.7889, lng: -63.2156, city: 'santa-cruz', channel: 'tradicional', subchannel: 'kiosko' },
+  { id: 'c39', name: 'Karina Barbery', ticketPromedio: 1560, ultimaCompra: '2026-02-10', ultimaVisita: '2026-02-10', metaMin: 1710, metaMax: 1830, lat: -17.7411, lng: -63.1877, city: 'santa-cruz', channel: 'moderno', subchannel: 'supermercado' },
+  { id: 'c40', name: 'Ramiro Chávez', ticketPromedio: 480, ultimaCompra: '2026-01-05', ultimaVisita: '2026-01-05', metaMin: 530, metaMax: 580, lat: -17.8143, lng: -63.1993, city: 'santa-cruz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c41', name: 'Yolanda Peña', ticketPromedio: 2150, ultimaCompra: '2025-12-15', ultimaVisita: '2025-12-15', metaMin: 2350, metaMax: 2500, lat: -17.7644, lng: -63.1706, city: 'santa-cruz', channel: 'moderno', subchannel: 'hipermercado' },
+  { id: 'c42', name: 'Sergio Antelo', ticketPromedio: 960, ultimaCompra: '2025-11-20', ultimaVisita: '2025-11-20', metaMin: 1050, metaMax: 1130, lat: -17.7967, lng: -63.1848, city: 'santa-cruz', channel: 'tradicional', subchannel: 'restaurante' },
+  { id: 'c43', name: 'Verónica Justiniano', ticketPromedio: 670, ultimaCompra: '2025-10-08', ultimaVisita: '2025-10-08', metaMin: 730, metaMax: 790, lat: -17.7509, lng: -63.2077, city: 'santa-cruz', channel: 'tradicional', subchannel: 'panaderia' },
+  { id: 'c44', name: 'Álvaro Roda', ticketPromedio: 1340, ultimaCompra: '2025-09-03', ultimaVisita: '2025-09-03', metaMin: 1470, metaMax: 1570, lat: -17.7756, lng: -63.1592, city: 'santa-cruz', channel: 'moderno', subchannel: 'tienda-conveniencia' },
+  { id: 'c45', name: 'Claudia Suárez', ticketPromedio: 590, ultimaCompra: '2025-07-01', ultimaVisita: '2026-08-20', metaMin: 650, metaMax: 700, lat: -17.8087, lng: -63.2034, city: 'santa-cruz', channel: 'tradicional', subchannel: 'licoreria' },
+  { id: 'c46', name: 'Freddy Vaca', ticketPromedio: 1870, ultimaCompra: '2025-05-10', ultimaVisita: '2025-05-10', metaMin: 2050, metaMax: 2180, lat: -17.7372, lng: -63.1729, city: 'santa-cruz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c47', name: 'Beatriz Ortiz', ticketPromedio: 430, ultimaCompra: '2025-03-01', ultimaVisita: '2025-03-01', metaMin: 470, metaMax: 510, lat: -17.8215, lng: -63.1859, city: 'santa-cruz', channel: 'tradicional', subchannel: 'kiosko' },
+  { id: 'c48', name: 'Iván Céspedes', ticketPromedio: 1120, ultimaCompra: '2025-01-10', ultimaVisita: '2025-01-10', metaMin: 1230, metaMax: 1310, lat: -17.7628, lng: -63.2119, city: 'santa-cruz', channel: 'moderno', subchannel: 'supermercado' },
+  { id: 'c49', name: 'Nadia Parada', ticketPromedio: 760, ultimaCompra: '2024-09-03', ultimaVisita: '2024-09-03', metaMin: 830, metaMax: 900, lat: -17.7481, lng: -63.1958, city: 'santa-cruz', channel: 'tradicional', subchannel: 'mercado-municipal' },
+  { id: 'c50', name: 'Óscar Añez', ticketPromedio: 2480, ultimaCompra: '2024-03-03', ultimaVisita: '2024-03-03', metaMin: 2700, metaMax: 2900, lat: -17.7903, lng: -63.1615, city: 'santa-cruz', channel: 'mayorista', subchannel: 'mayorista-general' },
 ]
+
+/** "Hoy" de referencia del mock, fijo para que el segmento no cambie según la fecha real del navegador. */
+const TARGETING_REFERENCE_DATE = new Date('2026-09-03T00:00:00')
+
+function monthsSince(dateStr: string | undefined, reference: Date): number {
+  if (!dateStr) return Infinity
+  const date = new Date(dateStr)
+  return (reference.getFullYear() - date.getFullYear()) * 12 + (reference.getMonth() - date.getMonth())
+}
+
+export const mockTargetClients: TargetClient[] = rawTargetClients.map((client, index) => {
+  const mesesUltimaCompra = monthsSince(client.ultimaCompra, TARGETING_REFERENCE_DATE)
+  const deuda = index % 5 === 0
+  const mora = deuda && index % 2 === 0
+
+  return {
+    ...client,
+    mesesUltimaCompra,
+    activo: mesesUltimaCompra <= 6,
+    comproMesActual: mesesUltimaCompra === 0,
+    visitadoMesActual: monthsSince(client.ultimaVisita, TARGETING_REFERENCE_DATE) === 0,
+    deuda,
+    mora,
+  }
+})
 
 export const mockStrategySummaries: StrategySummary[] = [
   {

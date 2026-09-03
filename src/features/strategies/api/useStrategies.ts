@@ -25,19 +25,51 @@ export function useStrategy(id: string | undefined) {
   })
 }
 
-/** Solo la condición de "Ventas históricas" tiene un campo mock real (ticketPromedio) contra el cual filtrar. */
-function matchesCondition(client: TargetClient, condition: TargetingCondition): boolean {
-  if (condition.field !== 'Ventas históricas') return true
-  const numeric = Number(condition.value.replace(/[.,]/g, ''))
-  if (Number.isNaN(numeric)) return true
-
-  switch (condition.operator) {
+function compareNumeric(clientValue: number, operator: ConditionOperator, target: number): boolean {
+  switch (operator) {
     case ConditionOperator.GreaterThan:
-      return client.ticketPromedio > numeric
+      return clientValue > target
     case ConditionOperator.LessThan:
-      return client.ticketPromedio < numeric
+      return clientValue < target
     case ConditionOperator.Equals:
-      return client.ticketPromedio === numeric
+      return clientValue === target
+    default:
+      return true
+  }
+}
+
+/**
+ * Traduce cada `TargetingCondition` (cuyo `field` varía según el objetivo elegido en el paso 1) a la
+ * propiedad real del cliente mock contra la que se filtra. Los campos numéricos/de meses que no llegan a
+ * completarse (valor vacío o no numérico) no filtran nada; los booleanos solo restringen cuando el
+ * checkbox está marcado — desmarcado significa "no importa" en vez de "debe ser falso".
+ */
+function matchesCondition(client: TargetClient, condition: TargetingCondition): boolean {
+  switch (condition.field) {
+    case 'Ventas históricas':
+    case 'Ticket':
+    case 'Ticket promedio del Origen': {
+      const numeric = Number(condition.value.replace(/[.,]/g, ''))
+      if (Number.isNaN(numeric)) return true
+      return compareNumeric(client.ticketPromedio, condition.operator, numeric)
+    }
+    case 'Última Compra':
+    case 'Última Compra del Origen': {
+      const months = Number(condition.value)
+      if (Number.isNaN(months)) return true
+      return compareNumeric(client.mesesUltimaCompra, condition.operator, months)
+    }
+    case 'Cliente Activo':
+    case 'Cliente activo':
+      return condition.value !== 'true' || client.activo
+    case 'Compró en el mes actual':
+      return condition.value !== 'true' || client.comproMesActual
+    case 'Visitado en el mes actual':
+      return condition.value !== 'true' || client.visitadoMesActual
+    case 'Deuda':
+      return condition.value !== 'true' || client.deuda
+    case 'Mora':
+      return condition.value !== 'true' || client.mora
     default:
       return true
   }

@@ -59,6 +59,13 @@ export interface TargetClient {
   city: string
   channel: string
   subchannel: string
+  /** Meses transcurridos desde `ultimaCompra`, precalculado para filtrar por la condición "Última Compra". */
+  mesesUltimaCompra: number
+  activo: boolean
+  comproMesActual: boolean
+  visitadoMesActual: boolean
+  deuda: boolean
+  mora: boolean
 }
 
 export interface PointsRule {

@@ -1,4 +1,4 @@
-import { ArrowRight, MapPinned, Package, Recycle, ShoppingCart, UserPlus, Users2 } from 'lucide-react'
+import { ArrowRight, Package, Recycle, ShoppingCart, UserPlus, Users2 } from 'lucide-react'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { Separator } from '@/components/ui/separator'
@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { IconOptionCard } from '@/features/strategies/components/IconOptionCard'
 import { ProductLevelField } from '@/features/strategies/components/ProductLevelField'
+import { createDefaultCondition } from '@/features/strategies/data/condition-fields'
 import { channelOptions, cityOptions, subChannelOptionsByChannel } from '@/features/strategies/data/criteria'
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
 import { StrategyObjective } from '@/features/strategies/types'
@@ -15,7 +16,6 @@ const objectiveOptions = [
   { value: StrategyObjective.IncreasePortfolio, icon: Package, title: 'Incrementar portafolio', description: 'Ampliar la variedad de productos que compran los clientes actuales.' },
   { value: StrategyObjective.RecoverCustomers, icon: Recycle, title: 'Recuperar clientes', description: 'Reactivar clientes que han dejado de comprar en el último periodo.' },
   { value: StrategyObjective.NewCustomers, icon: UserPlus, title: 'Crear nuevos clientes', description: 'Adquirir prospectos y convertirlos en compradores por primera vez.' },
-  { value: StrategyObjective.Other, icon: MapPinned, title: 'Otro', description: 'Definir un objetivo personalizado para esta campaña.' },
 ]
 
 function ProductSegmentSection({ objective }: { objective: StrategyObjective | null }) {
@@ -188,7 +188,14 @@ export function Step1Objective() {
               title={option.title}
               description={option.description}
               selected={data.objective === option.value}
-              onClick={() => update({ objective: option.value })}
+              onClick={() =>
+                update({
+                  objective: option.value,
+                  // Cada objetivo tiene su propio set de condiciones (Step2Targeting), así que al
+                  // cambiarlo las condiciones ya agregadas dejan de tener sentido y se reinician.
+                  conditions: data.objective === option.value ? data.conditions : [createDefaultCondition(option.value)],
+                })
+              }
             />
           ))}
         </div>

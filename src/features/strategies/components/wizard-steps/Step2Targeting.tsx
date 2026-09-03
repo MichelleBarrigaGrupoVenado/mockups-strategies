@@ -7,6 +7,7 @@ import { useTargetClients } from '@/features/strategies/api/useStrategies'
 import { ConditionRow } from '@/features/strategies/components/ConditionRow'
 import { ClientsMap } from '@/features/strategies/components/map/ClientsMap'
 import { SelectClientsMapDialog } from '@/features/strategies/components/map/SelectClientsMapDialog'
+import { ConditionFieldKind, getConditionFields, monthsOptions } from '@/features/strategies/data/condition-fields'
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
 import { ConditionJoin, ConditionOperator } from '@/features/strategies/types'
 import { formatBs, formatDate } from '@/shared/utils/format'
@@ -26,10 +27,18 @@ export function Step2Targeting() {
   const { data: displayedClients } = useTargetClients({ ...baseFilters, selectedClientIds: data.selectedClientIds })
 
   const hasManualSelection = !!data.selectedClientIds
+  const conditionFields = getConditionFields(data.objective)
 
   const summary = data.conditions
     .map((c, i) => {
-      const text = `${c.field} ${operatorLabels[c.operator]} ${c.value || '…'}`
+      const fieldConfig = conditionFields.find((f) => f.field === c.field)
+      const text =
+        fieldConfig?.kind === ConditionFieldKind.Boolean
+          ? `${c.field}: ${c.value === 'true' ? 'Sí' : 'No aplica'}`
+          : fieldConfig?.kind === ConditionFieldKind.Months
+            ? `${c.field} ${operatorLabels[c.operator]} ${monthsOptions.find((m) => m.value === c.value)?.label ?? '…'}`
+            : `${c.field} ${operatorLabels[c.operator]} ${c.value || '…'}`
+
       return i === 0 ? text : `${c.join ?? ConditionJoin.And} ${text}`
     })
     .join(' ')
@@ -67,6 +76,7 @@ export function Step2Targeting() {
               )}
               <ConditionRow
                 condition={condition}
+                objective={data.objective}
                 onChange={(patch) => updateCondition(condition.id, patch)}
                 onRemove={() => removeCondition(condition.id)}
               />
