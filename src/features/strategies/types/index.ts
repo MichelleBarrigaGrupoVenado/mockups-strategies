@@ -109,12 +109,17 @@ export interface StrategyWizardData {
   objective: StrategyObjective | null
   name: string
   description: string
+  /** yyyy-mm-dd */
+  startDate: string
+  /** yyyy-mm-dd — por defecto 3 meses después de `startDate`. */
+  endDate: string
   productLevel: string
-  productLevelValue: string
+  /** Uno o más nodos de `productLevel` seleccionados (ej. Ketchup y Mostaza dentro de "Familia"). */
+  productLevelValues: string[]
   productLevelA: string
-  productLevelValueA: string
+  productLevelValuesA: string[]
   productLevelB: string
-  productLevelValueB: string
+  productLevelValuesB: string[]
   city: string
   channel: string
   subchannel: string

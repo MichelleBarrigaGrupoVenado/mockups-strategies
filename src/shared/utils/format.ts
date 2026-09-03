@@ -12,3 +12,15 @@ export function formatDate(iso: string): string {
     new Date(iso)
   )
 }
+
+/** Fecha de hoy en formato `yyyy-mm-dd`, lista para un `<input type="date">`. */
+export function todayIso(): string {
+  return new Date().toISOString().split('T')[0]
+}
+
+/** `dateIso` desplazada `months` meses, preservando el formato `yyyy-mm-dd`. */
+export function addMonthsIso(dateIso: string, months: number): string {
+  const date = new Date(`${dateIso}T00:00:00`)
+  date.setMonth(date.getMonth() + months)
+  return date.toISOString().split('T')[0]
+}

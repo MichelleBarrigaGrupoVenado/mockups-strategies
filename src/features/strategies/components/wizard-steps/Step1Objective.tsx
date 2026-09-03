@@ -10,6 +10,7 @@ import { createDefaultCondition } from '@/features/strategies/data/condition-fie
 import { channelOptions, cityOptions, subChannelOptionsByChannel } from '@/features/strategies/data/criteria'
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
 import { StrategyObjective } from '@/features/strategies/types'
+import { addMonthsIso } from '@/shared/utils/format'
 
 const objectiveOptions = [
   { value: StrategyObjective.IncreaseTicket, icon: ShoppingCart, title: 'Incrementar ticket', description: 'Aumentar el valor promedio de cada transacción.' },
@@ -33,19 +34,19 @@ function ProductSegmentSection({ objective }: { objective: StrategyObjective | n
     return (
       <div className="flex flex-col gap-4">
         <p className="text-sm text-muted-foreground">
-          Elige el producto que el cliente ya compra (A) y el producto al que quieres que se cambie o sume (B). La estrategia buscará
-          clientes que compran A pero todavía no compran B.
+          Elige uno o más segmentos que el cliente ya compra (Segmento Origen) y uno o más segmentos a los que quieres que se cambie o
+          sume (Segmento Objetivo). La estrategia buscará clientes que compran el origen pero todavía no compran el objetivo.
         </p>
 
         <FieldGroup className="gap-3 rounded-lg border border-border p-3">
-          <span className="text-xs font-semibold text-primary uppercase">Producto A — que ya compran</span>
+          <span className="text-xs font-semibold text-primary uppercase">Segmento Origen — que ya compran</span>
           <ProductLevelField
-            levelLabel="Nivel de producto A"
-            valueLabel="Buscar producto A"
+            levelLabel="Nivel del segmento origen"
+            valueLabel="Buscar segmento origen"
             level={data.productLevelA}
-            value={data.productLevelValueA}
+            values={data.productLevelValuesA}
             onLevelChange={(level) => update({ productLevelA: level })}
-            onValueChange={(value) => update({ productLevelValueA: value })}
+            onValuesChange={(values) => update({ productLevelValuesA: values })}
           />
         </FieldGroup>
 
@@ -54,14 +55,14 @@ function ProductSegmentSection({ objective }: { objective: StrategyObjective | n
         </div>
 
         <FieldGroup className="gap-3 rounded-lg border border-border p-3">
-          <span className="text-xs font-semibold text-primary uppercase">Producto B — que queremos que compren</span>
+          <span className="text-xs font-semibold text-primary uppercase">Segmento Objetivo — que queremos que compren</span>
           <ProductLevelField
-            levelLabel="Nivel de producto B"
-            valueLabel="Buscar producto B"
+            levelLabel="Nivel del segmento objetivo"
+            valueLabel="Buscar segmento objetivo"
             level={data.productLevelB}
-            value={data.productLevelValueB}
+            values={data.productLevelValuesB}
             onLevelChange={(level) => update({ productLevelB: level })}
-            onValueChange={(value) => update({ productLevelValueB: value })}
+            onValuesChange={(values) => update({ productLevelValuesB: values })}
           />
         </FieldGroup>
       </div>
@@ -69,9 +70,15 @@ function ProductSegmentSection({ objective }: { objective: StrategyObjective | n
   }
 
   const labelByObjective: Partial<Record<StrategyObjective, string>> = {
-    [StrategyObjective.RecoverCustomers]: 'Producto que dejaron de comprar',
-    [StrategyObjective.IncreaseTicket]: 'Producto a impulsar',
-    [StrategyObjective.Other]: 'Producto relacionado',
+    [StrategyObjective.RecoverCustomers]: 'Segmentos que dejaron de comprar',
+    [StrategyObjective.IncreaseTicket]: 'Segmentos a impulsar',
+    [StrategyObjective.Other]: 'Segmentos relacionados',
+  }
+
+  const hintByObjective: Partial<Record<StrategyObjective, string>> = {
+    // Único caso donde dejar la selección vacía es intencional: la estrategia puede aplicarse a
+    // clientes inactivos sin acotar a un segmento de producto específico.
+    [StrategyObjective.RecoverCustomers]: 'Opcional: puedes dejarlo vacío para no acotar por producto.',
   }
 
   return (
@@ -80,9 +87,10 @@ function ProductSegmentSection({ objective }: { objective: StrategyObjective | n
         levelLabel="Seleccionar nivel de productos"
         valueLabel={objective ? (labelByObjective[objective] ?? 'Buscar producto') : 'Buscar producto'}
         level={data.productLevel}
-        value={data.productLevelValue}
+        values={data.productLevelValues}
         onLevelChange={(level) => update({ productLevel: level })}
-        onValueChange={(value) => update({ productLevelValue: value })}
+        onValuesChange={(values) => update({ productLevelValues: values })}
+        hint={objective ? hintByObjective[objective] : undefined}
       />
     </FieldGroup>
   )
@@ -122,6 +130,30 @@ export function Step1Objective() {
                 onChange={(e) => update({ description: e.target.value })}
               />
             </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field>
+                <FieldLabel htmlFor="strategy-start-date">Fecha inicio</FieldLabel>
+                <Input
+                  id="strategy-start-date"
+                  type="date"
+                  value={data.startDate}
+                  onChange={(e) => {
+                    const startDate = e.target.value
+                    update({ startDate, endDate: startDate ? addMonthsIso(startDate, 3) : data.endDate })
+                  }}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="strategy-end-date">Fecha finalización</FieldLabel>
+                <Input
+                  id="strategy-end-date"
+                  type="date"
+                  value={data.endDate}
+                  min={data.startDate || undefined}
+                  onChange={(e) => update({ endDate: e.target.value })}
+                />
+              </Field>
+            </div>
           </FieldGroup>
 
           <Separator />

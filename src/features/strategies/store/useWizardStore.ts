@@ -1,17 +1,22 @@
 import { create } from 'zustand'
 import { createDefaultCondition } from '@/features/strategies/data/condition-fields'
 import { ActionType, ClientIncentiveType, ConditionJoin, ConditionOperator, type StrategyWizardData, type TargetingCondition } from '@/features/strategies/types'
+import { addMonthsIso, todayIso } from '@/shared/utils/format'
+
+const defaultStartDate = todayIso()
 
 const initialData: StrategyWizardData = {
   objective: null,
   name: '',
   description: '',
+  startDate: defaultStartDate,
+  endDate: addMonthsIso(defaultStartDate, 3),
   productLevel: '',
-  productLevelValue: '',
+  productLevelValues: [],
   productLevelA: '',
-  productLevelValueA: '',
+  productLevelValuesA: [],
   productLevelB: '',
-  productLevelValueB: '',
+  productLevelValuesB: [],
   city: '',
   channel: '',
   subchannel: '',
