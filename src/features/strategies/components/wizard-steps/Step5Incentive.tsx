@@ -512,17 +512,17 @@ export function Step5Incentive() {
 
             <RadioGroup
               className="flex flex-row gap-6"
-              value={
-                data.pointsExpire
-                  ? 'con-vencimiento'
-                  : 'sin-vencimiento'
-              }
-              onValueChange={(value) =>
+              value={data.pointsExpire ? 'con-vencimiento' : 'sin-vencimiento'}
+              onValueChange={(value) => {
+                const hasExpiration = value === 'con-vencimiento'
+
                 update({
-                  pointsExpire:
-                    value === 'con-vencimiento',
+                  pointsExpire: hasExpiration,
+                  pointsExpirationDate: hasExpiration
+                    ? data.pointsExpirationDate
+                    : undefined,
                 })
-              }
+              }}
             >
               <Label className="flex items-center gap-2 text-sm font-normal">
                 <RadioGroupItem value="sin-vencimiento" />
@@ -534,7 +534,28 @@ export function Step5Incentive() {
                 Con fecha de vencimiento
               </Label>
               {data.pointsExpire && (
-                <div>date</div>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="pointsExpirationDate">
+                    Fecha de vencimiento
+                  </Label>
+
+                  <Input
+                    id="pointsExpirationDate"
+                    type="date"
+                    value={data.pointsExpirationDate ?? ''}
+                    min={new Date().toISOString().split('T')[0]}
+                    onChange={(e) =>
+                      update({
+                        pointsExpirationDate: e.target.value,
+                      })
+                    }
+                    className="w-fit"
+                  />
+
+                  <span className="text-xs text-muted-foreground">
+                    Los puntos generados por esta estrategia vencerán en esta fecha.
+                  </span>
+                </div>
               )}
             </RadioGroup>
           </div>
