@@ -7,7 +7,10 @@ export const cityCenters: Record<string, { lat: number; lng: number }> = {
   cochabamba: { lat: -17.3895, lng: -66.1568 },
 }
 
-type RawTargetClient = Omit<TargetClient, 'mesesUltimaCompra' | 'activo' | 'comproMesActual' | 'visitadoMesActual' | 'deuda' | 'mora'>
+type RawTargetClient = Omit<
+  TargetClient,
+  'mesesUltimaCompra' | 'activo' | 'comproMesActual' | 'visitadoMesActual' | 'deuda' | 'mora' | 'ticketPromedioSegmento' | 'frecuenciaCompra'
+>
 
 const rawTargetClients: RawTargetClient[] = [
   { id: 'c1', name: 'María López', ticketPromedio: 1250, ultimaCompra: '2026-08-15', metaMin: 1375, metaMax: 1500, lat: -17.7699, lng: -63.1955, city: 'santa-cruz', channel: 'moderno', subchannel: 'supermercado' },
@@ -78,6 +81,9 @@ export const mockTargetClients: TargetClient[] = rawTargetClients.map((client, i
   const mesesUltimaCompra = monthsSince(client.ultimaCompra, TARGETING_REFERENCE_DATE)
   const deuda = index % 5 === 0
   const mora = deuda && index % 2 === 0
+  // Proporción del ticket general que corresponde al segmento de producto de la estrategia; varía en
+  // ciclos de 5 (0.15 a 0.47) para que la columna "Ticket prom. segmento" no sea un simple % fijo.
+  const segmentRatio = 0.15 + (index % 5) * 0.08
 
   return {
     ...client,
@@ -87,6 +93,8 @@ export const mockTargetClients: TargetClient[] = rawTargetClients.map((client, i
     visitadoMesActual: monthsSince(client.ultimaVisita, TARGETING_REFERENCE_DATE) === 0,
     deuda,
     mora,
+    ticketPromedioSegmento: Math.round(client.ticketPromedio * segmentRatio),
+    frecuenciaCompra: 1 + (index % 6),
   }
 })
 

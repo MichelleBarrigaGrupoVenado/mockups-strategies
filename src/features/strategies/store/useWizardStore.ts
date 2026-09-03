@@ -24,6 +24,8 @@ const initialData: StrategyWizardData = {
     { id: crypto.randomUUID(), field: 'Ventas históricas', operator: ConditionOperator.GreaterThan, value: '500', join: ConditionJoin.And },
   ],
   selectedClientIds: null,
+  excludedClientIds: [],
+  manuallyAddedClientIds: [],
   kpiPrincipal: 'Ticket promedio',
   metaMinPercent: 10,
   metaMaxPercent: 20,

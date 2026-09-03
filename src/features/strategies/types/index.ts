@@ -49,7 +49,12 @@ export interface TargetingCondition {
 export interface TargetClient {
   id: string
   name: string
+  /** Ticket promedio general del cliente, sin acotar por segmento de producto. */
   ticketPromedio: number
+  /** Ticket promedio del cliente dentro del segmento de producto de la estrategia. */
+  ticketPromedioSegmento: number
+  /** Compras por mes. */
+  frecuenciaCompra: number
   ultimaCompra: string
   ultimaVisita?: string
   metaMin?: number
@@ -126,6 +131,10 @@ export interface StrategyWizardData {
   conditions: TargetingCondition[]
   /** Ids de clientes elegidos a mano dibujando un polígono en el mapa. null = usar el filtro automático. */
   selectedClientIds: string[] | null
+  /** Ids quitados manualmente de la tabla de resultados (acción "Quitar cliente"), sin importar el modo de selección. */
+  excludedClientIds: string[]
+  /** Ids agregados manualmente con el buscador (ej. un cliente que cumple las condiciones pero quedó fuera del polígono). */
+  manuallyAddedClientIds: string[]
   kpiPrincipal: string
   metaMinPercent: number
   metaMaxPercent: number
