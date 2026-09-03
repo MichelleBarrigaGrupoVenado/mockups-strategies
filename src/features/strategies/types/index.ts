@@ -127,6 +127,7 @@ export interface StrategyWizardData {
   pointsExpirationDate?: string
   employeeIncentiveEnabled: boolean
   complianceRules: ComplianceRule[]
+  priceRuleIncentiveEnabled: boolean
 }
 
 export interface StrategySummary {

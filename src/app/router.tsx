@@ -13,6 +13,7 @@ import { AppLayout } from '@/app/layout/AppLayout'
 import { PlaceholderPage } from '@/app/pages/PlaceholderPage'
 import { ResultDetailPage } from '@/features/results/pages/ResultDetailPage'
 import { ResultsListPage } from '@/features/results/pages/ResultsListPage'
+import { CreatePriceRulePage } from '@/features/strategies/pages/CreatePriceRulePage'
 import { CreateStrategyPage } from '@/features/strategies/pages/CreateStrategyPage'
 import { StrategiesListPage } from '@/features/strategies/pages/StrategiesListPage'
 import { StrategyDetailPage } from '@/features/strategies/pages/StrategyDetailPage'
@@ -38,6 +39,7 @@ export function AppRouter() {
         <Route path="estrategias">
           <Route index element={<StrategiesListPage />} />
           <Route path="crear" element={<CreateStrategyPage />} />
+          <Route path="crear/regla-precios" element={<CreatePriceRulePage />} />
           <Route path=":id" element={<StrategyDetailPage />} />
         </Route>
 

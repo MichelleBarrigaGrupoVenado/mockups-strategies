@@ -1,5 +1,4 @@
 import { ArrowLeft, ArrowRight, X } from 'lucide-react'
-import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -23,13 +22,9 @@ const steps: StepItem[] = [
 const stepComponents = [Step1Objective, Step2Targeting, Step3Kpi, Step4Action, Step5Incentive]
 
 export function CreateStrategyPage() {
-  const { step, setStep, data, reset } = useWizardStore()
+  const { step, setStep, data } = useWizardStore()
   const createStrategy = useCreateStrategy()
   const navigate = useNavigate()
-
-  useEffect(() => {
-    reset()
-  }, [reset])
 
   const StepComponent = stepComponents[step]
   const isLastStep = step === steps.length - 1

@@ -4,6 +4,7 @@ export interface ProductRefItem {
   id: string
   parentId: string | null
   name: string
+  imageUrl?: string
 }
 
 /** product_channels_ref */
@@ -79,7 +80,7 @@ const families: ProductRefItem[] = [
 /** product_ref (family_id) — nivel final, ejemplo de SKUs por familia */
 const products: ProductRefItem[] = [
   { id: 'pr-1', parentId: 'fa-1', name: 'Sopa de Pollo con Fideo 70g' },
-  { id: 'pr-2', parentId: 'fa-1', name: 'Caldo de Gallina 12 cubos' },
+  { id: 'pr-2', parentId: 'fa-1', name: 'Caldo de Gallina 12 cubos', imageUrl: 'https://amarket.com.bo/cdn/shop/files/7771214007910_1200x1200.jpg?v=1769188078' },
   { id: 'pr-3', parentId: 'fa-2', name: 'Cereal de Maíz Azucarado 400g' },
   { id: 'pr-4', parentId: 'fa-2', name: 'Avena Instantánea 300g' },
   { id: 'pr-5', parentId: 'fa-3', name: 'Chocolate en Polvo Clásico 400g' },

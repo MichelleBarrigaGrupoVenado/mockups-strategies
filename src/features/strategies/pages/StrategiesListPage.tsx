@@ -7,9 +7,11 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { useStrategies } from '@/features/strategies/api/useStrategies'
 import { StrategyCard } from '@/features/strategies/components/StrategyCard'
+import { useWizardStore } from '@/features/strategies/store/useWizardStore'
 
 export function StrategiesListPage() {
   const { data: strategies, isLoading } = useStrategies()
+  const resetWizard = useWizardStore((s) => s.reset)
   const [view, setView] = useState<'grid' | 'table'>('grid')
   const [search, setSearch] = useState('')
 
@@ -23,7 +25,7 @@ export function StrategiesListPage() {
           <p className="text-sm text-muted-foreground">Diseña y administra estrategias para generar crecimiento comercial.</p>
         </div>
         <Button asChild>
-          <Link to="/estrategias/crear">
+          <Link to="/estrategias/crear" onClick={resetWizard}>
             <Plus data-icon="inline-start" />
             Crear estrategia
           </Link>
@@ -80,6 +82,7 @@ export function StrategiesListPage() {
 
         <Link
           to="/estrategias/crear"
+          onClick={resetWizard}
           className="flex min-h-64 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-border text-center transition-colors hover:border-primary/40 hover:bg-muted/40"
         >
           <span className="flex size-11 items-center justify-center rounded-full bg-primary/10 text-primary">

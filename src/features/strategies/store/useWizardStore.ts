@@ -35,6 +35,7 @@ const initialData: StrategyWizardData = {
   pointsExpire: false,
   employeeIncentiveEnabled: true,
   complianceRules: [{ id: crypto.randomUUID(), percent: 100, points: 0 }],
+  priceRuleIncentiveEnabled: false,
 }
 
 interface WizardState {

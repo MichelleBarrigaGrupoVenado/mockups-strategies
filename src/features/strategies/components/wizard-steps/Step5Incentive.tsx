@@ -1,5 +1,6 @@
-import { Plus, Search, Trash2 } from 'lucide-react'
+import { ArrowRight, Plus, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -57,6 +58,7 @@ export function Step5Incentive() {
     updatePointsRule,
   } = useWizardStore()
 
+  const navigate = useNavigate()
   const [productSearch, setProductSearch] = useState('')
 
   const filteredProducts = mockProducts.filter((product) => {
@@ -650,6 +652,52 @@ export function Step5Incentive() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* REGLA DE PRECIOS */}
+      <div className="flex items-center justify-between rounded-xl border border-border bg-card p-5">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-base font-semibold text-foreground">
+            Regla de Precios
+          </span>
+
+          <span className="text-sm text-muted-foreground">
+            ¿Quieres asociar un ajuste de precios a esta estrategia?
+          </span>
+        </div>
+
+        <Switch
+          checked={data.priceRuleIncentiveEnabled}
+          onCheckedChange={(checked) =>
+            update({
+              priceRuleIncentiveEnabled: !!checked,
+            })
+          }
+        />
+      </div>
+
+      {data.priceRuleIncentiveEnabled && (
+        <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-semibold text-foreground">
+              Ajuste de precios
+            </span>
+
+            <span className="text-xs text-muted-foreground">
+              Define descuentos, precios fijos o recargos para los productos de esta estrategia.
+            </span>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-fit"
+            onClick={() => navigate('/estrategias/crear/regla-precios')}
+          >
+            Crear regla de precios
+            <ArrowRight data-icon="inline-end" />
+          </Button>
         </div>
       )}
     </div>
