@@ -9,7 +9,6 @@ import {
   RadioGroup,
   RadioGroupItem,
 } from '@/components/ui/radio-group'
-import { Switch } from '@/components/ui/switch'
 import {
   NativeSelect,
   NativeSelectOption,
@@ -17,6 +16,7 @@ import {
 
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
 import {
+  ActionType,
   ClientIncentiveType,
   ProductUnitType,
 } from '@/features/strategies/types'
@@ -122,30 +122,19 @@ export function Step5Incentive() {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* CLIENTES */}
-      <div className="flex items-center justify-between rounded-xl border border-border bg-card p-5">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-base font-semibold text-foreground">
-            Venado Money para Clientes
-          </span>
-
-          <span className="text-sm text-muted-foreground">
-            ¿Quieres asociar un incentivo a esta estrategia?
-          </span>
-        </div>
-
-        <Switch
-          checked={data.clientIncentiveEnabled}
-          onCheckedChange={(checked) =>
-            update({
-              clientIncentiveEnabled: !!checked,
-            })
-          }
-        />
-      </div>
-
-      {data.clientIncentiveEnabled && (
+      {/* CLIENTES — solo aparece si se eligió "Ofrecer puntos al Cliente" en el paso 4 (Acción). */}
+      {data.actionTypes.includes(ActionType.OfferPoints) && (
         <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-base font-semibold text-foreground">
+              Venado Money para Clientes
+            </span>
+
+            <span className="text-sm text-muted-foreground">
+              Habilitado porque seleccionaste "Ofrecer puntos al Cliente" en el paso anterior.
+            </span>
+          </div>
+
           {/* TIPO DE INCENTIVO — oculto: ver SHOW_CLIENT_INCENTIVE_TYPE_PICKER arriba. */}
           {SHOW_CLIENT_INCENTIVE_TYPE_PICKER && (
           <div className="flex flex-col gap-3">
@@ -713,30 +702,19 @@ export function Step5Incentive() {
         </div>
       )}
 
-      {/* EMPLEADOS */}
-      <div className="flex items-center justify-between rounded-xl border border-border bg-card p-5">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-base font-semibold text-foreground">
-            Venado Money para Empleados
-          </span>
-
-          <span className="text-sm text-muted-foreground">
-            ¿Quieres asociar un incentivo a esta estrategia?
-          </span>
-        </div>
-
-        <Switch
-          checked={data.employeeIncentiveEnabled}
-          onCheckedChange={(checked) =>
-            update({
-              employeeIncentiveEnabled: !!checked,
-            })
-          }
-        />
-      </div>
-
-      {data.employeeIncentiveEnabled && (
+      {/* EMPLEADOS — solo aparece si se eligió "Ofrecer puntos al Empleado" en el paso 4 (Acción). */}
+      {data.actionTypes.includes(ActionType.OfferEmployeePoints) && (
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-base font-semibold text-foreground">
+              Venado Money para Empleados
+            </span>
+
+            <span className="text-sm text-muted-foreground">
+              Habilitado porque seleccionaste "Ofrecer puntos al Empleado" en el paso anterior.
+            </span>
+          </div>
+
           <span className="text-sm font-semibold text-foreground">
             Nivel de Cumplimiento para Empleado
           </span>
@@ -803,30 +781,19 @@ export function Step5Incentive() {
         </div>
       )}
 
-      {/* REGLA DE PRECIOS */}
-      <div className="flex items-center justify-between rounded-xl border border-border bg-card p-5">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-base font-semibold text-foreground">
-            Regla de Precios
-          </span>
-
-          <span className="text-sm text-muted-foreground">
-            ¿Quieres asociar un ajuste de precios a esta estrategia?
-          </span>
-        </div>
-
-        <Switch
-          checked={data.priceRuleIncentiveEnabled}
-          onCheckedChange={(checked) =>
-            update({
-              priceRuleIncentiveEnabled: !!checked,
-            })
-          }
-        />
-      </div>
-
-      {data.priceRuleIncentiveEnabled && (
+      {/* REGLA DE PRECIOS — solo aparece si se eligió "Ofrecer regla de precios" en el paso 4 (Acción). */}
+      {data.actionTypes.includes(ActionType.OfferPriceRule) && (
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-base font-semibold text-foreground">
+              Regla de Precios
+            </span>
+
+            <span className="text-sm text-muted-foreground">
+              Habilitado porque seleccionaste "Ofrecer regla de precios" en el paso anterior.
+            </span>
+          </div>
+
           <div className="flex flex-col gap-0.5">
             <span className="text-sm font-semibold text-foreground">
               Ajuste de precios

@@ -1,4 +1,5 @@
 import { ArrowLeft, ArrowRight, X } from 'lucide-react'
+import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -10,27 +11,43 @@ import { Step3Kpi } from '@/features/strategies/components/wizard-steps/Step3Kpi
 import { Step4Action } from '@/features/strategies/components/wizard-steps/Step4Action'
 import { Step5Incentive } from '@/features/strategies/components/wizard-steps/Step5Incentive'
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
-
-const steps: StepItem[] = [
-  { id: 'objetivo', label: 'Objetivo' },
-  { id: 'a-quien', label: '¿A quién?' },
-  { id: 'kpi', label: 'KPI/Meta' },
-  { id: 'accion', label: 'Acción' },
-  { id: 'incentivo', label: 'Incentivo' },
-]
+import { ActionType } from '@/features/strategies/types'
 
 const stepComponents = [Step1Objective, Step2Targeting, Step3Kpi, Step4Action, Step5Incentive]
+
+// El paso 5 (Incentivo) solo tiene algo que configurar si se eligió alguna de estas acciones en el
+// paso 4 — de lo contrario no aplica ningún incentivo y la estrategia se puede guardar directamente
+// desde "Acción".
+const ACTIONS_THAT_NEED_INCENTIVE_STEP: ActionType[] = [ActionType.OfferPoints, ActionType.OfferEmployeePoints, ActionType.OfferPriceRule]
 
 export function CreateStrategyPage() {
   const { step, setStep, data } = useWizardStore()
   const createStrategy = useCreateStrategy()
   const navigate = useNavigate()
 
+  const needsIncentiveStep = data.actionTypes.some((type) => ACTIONS_THAT_NEED_INCENTIVE_STEP.includes(type))
+
+  const steps: StepItem[] = [
+    { id: 'objetivo', label: 'Objetivo' },
+    { id: 'a-quien', label: '¿A quién?' },
+    { id: 'kpi', label: 'KPI/Meta' },
+    { id: 'accion', label: 'Acción' },
+    { id: 'incentivo', label: 'Incentivo', disabled: !needsIncentiveStep },
+  ]
+
   const StepComponent = stepComponents[step]
-  const isLastStep = step === steps.length - 1
+  const lastStepIndex = needsIncentiveStep ? steps.length - 1 : steps.length - 2
+  const isLastStep = step === lastStepIndex
 
   const canAdvance =
-    step === 0 ? !!data.objective && data.name.trim().length >= 3 : step === 3 ? !!data.actionTypes : true
+    step === 0 ? !!data.objective && data.name.trim().length >= 3 : step === 3 ? data.actionTypes.length > 0 : true
+
+  // Si el usuario llega a estar en el paso 5 (por ejemplo yendo hacia atrás) y luego quita del paso 4
+  // todas las acciones que requieren incentivo, el paso deja de estar disponible — se lo regresa a
+  // "Acción" en vez de dejarlo varado en una pantalla ahora deshabilitada.
+  useEffect(() => {
+    if (step === 4 && !needsIncentiveStep) setStep(3)
+  }, [step, needsIncentiveStep, setStep])
 
   function handleNext() {
     if (!canAdvance) {

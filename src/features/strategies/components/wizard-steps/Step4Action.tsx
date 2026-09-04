@@ -1,17 +1,63 @@
-import { MapPin, MoreHorizontal, Package, ShoppingCart, Tags, ThumbsUp } from 'lucide-react'
+import { CircleDollarSign, ClipboardCheck, Coins, Gift, Lightbulb, Tag } from 'lucide-react'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
 import { IconOptionCard } from '@/features/strategies/components/IconOptionCard'
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
-import { ActionType } from '@/features/strategies/types'
+import { ActionType, type StrategyWizardData } from '@/features/strategies/types'
+
+/**
+ * Cada una de estas acciones tiene su propia sección en el Paso 5 (Incentivo) — al elegirla se
+ * habilita automáticamente esa sección (y el paso deja de estar deshabilitado en el stepper); al
+ * quitarla, la sección vuelve a ocultarse. Ver Step5Incentive y CreateStrategyPage.
+ */
+const incentiveFlagByAction: Partial<Record<ActionType, keyof StrategyWizardData>> = {
+  [ActionType.OfferPoints]: 'clientIncentiveEnabled',
+  [ActionType.OfferEmployeePoints]: 'employeeIncentiveEnabled',
+  [ActionType.OfferPriceRule]: 'priceRuleIncentiveEnabled',
+}
 
 const actionOptions = [
-  { value: ActionType.OfferProduct, icon: Package, title: 'Ofrecer producto', description: 'Presenta un producto puntual al cliente.' },
-  { value: ActionType.RecommendProducts, icon: ThumbsUp, title: 'Recomendar productos', description: 'Sugiere productos relacionados al historial de compra.' },
-  { value: ActionType.VisitClient, icon: MapPin, title: 'Visitar cliente', description: 'Programa una visita presencial del vendedor.' },
-  { value: ActionType.SellProducts, icon: ShoppingCart, title: 'Vender productos', description: 'Impulsa el cierre directo de una venta.' },
-  { value: ActionType.OfferPoints, icon: Tags, title: 'Ofrecer puntos al cliente', description: 'Otorga puntos Venado Money como incentivo.' },
-  { value: ActionType.Other, icon: MoreHorizontal, title: 'Otro', description: 'Define una acción personalizada.' },
+  {
+    value: ActionType.OfferProduct,
+    icon: Gift,
+    title: 'Ofrecer producto',
+    description: 'Se envía una notificación por E-Venado al cliente.',
+  },
+  {
+    value: ActionType.RecommendProducts,
+    icon: Lightbulb,
+    title: 'Recomendar productos',
+    description:
+      'Sugiere productos al cliente mediante la aplicación de E-Venado y al vendedor mediante la búsqueda.',
+  },
+  {
+    value: ActionType.OfferPoints,
+    icon: CircleDollarSign,
+    title: 'Ofrecer puntos al Cliente',
+    description:
+      'Permite dar puntos tanto al cliente como al vendedor y añadir una regla de precios.',
+  },
+  {
+    value: ActionType.AssignTask,
+    icon: ClipboardCheck,
+    title: 'Agregar tarea a vendedor',
+    description:
+      'Añade una tarea al vendedor para que vaya a ofrecer los productos.',
+  },
+  {
+    value: ActionType.OfferEmployeePoints,
+    icon: Coins,
+    title: 'Ofrecer puntos al Empleado',
+    description:
+      'Otorga puntos Venado Money como incentivo al cumplir el objetivo.',
+  },
+  {
+    value: ActionType.OfferPriceRule,
+    icon: Tag,
+    title: 'Ofrecer regla de precios',
+    description:
+      'Otorga una regla de precios al cliente al cumplir su objetivo.',
+  },
 ]
 
 export function Step4Action() {
@@ -19,11 +65,14 @@ export function Step4Action() {
 
   const toggleAction = (action: ActionType) => {
     const isSelected = data.actionTypes.includes(action)
+    const incentiveFlag = incentiveFlagByAction[action]
 
     update({
       actionTypes: isSelected
         ? data.actionTypes.filter((item) => item !== action)
         : [...data.actionTypes, action],
+      // Selecciona la acción → habilita su sección de incentivo en el paso 5; la deselecciona → la oculta.
+      ...(incentiveFlag ? { [incentiveFlag]: !isSelected } : {}),
     })
   }
 

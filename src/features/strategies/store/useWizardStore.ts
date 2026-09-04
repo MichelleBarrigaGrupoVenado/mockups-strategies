@@ -33,7 +33,9 @@ const initialData: StrategyWizardData = {
     ActionType.RecommendProducts,
   ],
   actionDetail: '',
-  clientIncentiveEnabled: true,
+  // Se habilita automáticamente al elegir la acción correspondiente en el paso 4 (ver Step4Action) —
+  // arranca en `false` porque el default de `actionTypes` no incluye ninguna de esas acciones.
+  clientIncentiveEnabled: false,
   // El selector de tipo está oculto por ahora en Step5Incentive (ver SHOW_CLIENT_INCENTIVE_TYPE_PICKER) —
   // "Por cumplimiento" es el único tipo visible, así que es el único default que tiene sentido.
   clientIncentiveType: ClientIncentiveType.Compliance,
@@ -48,7 +50,8 @@ const initialData: StrategyWizardData = {
   ],
   productPointsRules: [],
   pointsExpire: false,
-  employeeIncentiveEnabled: true,
+  // Mismo criterio que `clientIncentiveEnabled`: se habilita al elegir "Ofrecer puntos al Empleado" en el paso 4.
+  employeeIncentiveEnabled: false,
   complianceRules: [{ id: crypto.randomUUID(), percent: 100, points: 0 }],
   priceRuleIncentiveEnabled: false,
   priceRule: null,

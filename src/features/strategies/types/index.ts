@@ -20,10 +20,10 @@ export type StrategyStatus = (typeof StrategyStatus)[keyof typeof StrategyStatus
 export const ActionType = {
   OfferProduct: 'offer_product',
   RecommendProducts: 'recommend_products',
-  VisitClient: 'visit_client',
-  SellProducts: 'sell_products',
   OfferPoints: 'offer_points',
-  Other: 'other',
+  AssignTask: 'assign_task',
+  OfferEmployeePoints: 'offer_employee_points',
+  OfferPriceRule: 'offer_price_rule',
 } as const
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
 
