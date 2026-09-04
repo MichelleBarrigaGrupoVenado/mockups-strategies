@@ -1,4 +1,6 @@
-import { ArrowRight, Package, Recycle, ShoppingCart, UserPlus, Users2 } from 'lucide-react'
+import { ArrowRight, ChevronDown, Package, Recycle, ShoppingCart, UserPlus, Users2, type LucideIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { Separator } from '@/components/ui/separator'
@@ -18,6 +20,24 @@ const objectiveOptions = [
   { value: StrategyObjective.RecoverCustomers, icon: Recycle, title: 'Recuperar clientes', description: 'Reactivar clientes que han dejado de comprar en el último periodo.' },
   { value: StrategyObjective.NewCustomers, icon: UserPlus, title: 'Crear nuevos clientes', description: 'Adquirir prospectos y convertirlos en compradores por primera vez.' },
 ]
+
+/** Cada sección del formulario se puede retraer para reducir el desplazamiento una vez completada. */
+function CollapsibleSection({ icon: Icon, title, children }: { icon: LucideIcon; title: string; children: ReactNode }) {
+  return (
+    <Collapsible defaultOpen className="flex flex-col gap-4">
+      <CollapsibleTrigger>
+        <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+          <Icon size={16} className="text-muted-foreground" />
+          {title}
+        </span>
+        <ChevronDown size={16} className="shrink-0 text-muted-foreground transition-transform duration-200 group-data-[panel-open]/collapsible-trigger:rotate-180" />
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="flex flex-col gap-4 pt-0.5">{children}</div>
+      </CollapsibleContent>
+    </Collapsible>
+  )
+}
 
 function ProductSegmentSection({ objective }: { objective: StrategyObjective | null }) {
   const { data, update } = useWizardStore()
@@ -108,29 +128,34 @@ export function Step1Objective() {
         <p className="text-sm text-muted-foreground">Selecciona el objetivo principal de esta estrategia.</p>
       </div>
 
-      <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-        <div className="flex min-w-0 flex-col gap-5 rounded-xl border border-border bg-card p-5">
-          <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-            <Users2 size={16} className="text-muted-foreground" />
-            Datos Generales
-          </div>
+      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {objectiveOptions.map((option) => (
+          <IconOptionCard
+            key={option.value}
+            icon={option.icon}
+            title={option.title}
+            description={option.description}
+            selected={data.objective === option.value}
+            onClick={() =>
+              update({
+                objective: option.value,
+                // Cada objetivo tiene su propio set de condiciones (Step2Targeting), así que al
+                // cambiarlo las condiciones ya agregadas dejan de tener sentido y se reinician.
+                conditions: data.objective === option.value ? data.conditions : [createDefaultCondition(option.value)],
+              })
+            }
+          />
+        ))}
+      </div>
 
+      <div className="flex min-w-0 flex-col gap-5 rounded-xl border border-border bg-card p-5">
+        <CollapsibleSection icon={Users2} title="Datos Generales">
           <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="strategy-name">Nombre</FieldLabel>
-              <Input id="strategy-name" placeholder="Ingresar Nombre..." value={data.name} onChange={(e) => update({ name: e.target.value })} />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="strategy-description">Descripción</FieldLabel>
-              <Textarea
-                id="strategy-description"
-                placeholder="Ingresar Descripción..."
-                rows={3}
-                value={data.description}
-                onChange={(e) => update({ description: e.target.value })}
-              />
-            </Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <Field className="sm:col-span-1">
+                <FieldLabel htmlFor="strategy-name">Nombre</FieldLabel>
+                <Input id="strategy-name" placeholder="Ingresar Nombre..." value={data.name} onChange={(e) => update({ name: e.target.value })} />
+              </Field>
               <Field>
                 <FieldLabel htmlFor="strategy-start-date">Fecha inicio</FieldLabel>
                 <Input
@@ -154,25 +179,29 @@ export function Step1Objective() {
                 />
               </Field>
             </div>
+            <Field>
+              <FieldLabel htmlFor="strategy-description">Descripción</FieldLabel>
+              <Textarea
+                id="strategy-description"
+                placeholder="Ingresar Descripción..."
+                rows={2}
+                value={data.description}
+                onChange={(e) => update({ description: e.target.value })}
+              />
+            </Field>
           </FieldGroup>
+        </CollapsibleSection>
 
-          <Separator />
+        <Separator />
 
-          <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-            <Package size={16} className="text-muted-foreground" />
-            Segmento de Productos
-          </div>
-
+        <CollapsibleSection icon={Package} title="Segmento de Productos">
           <ProductSegmentSection objective={data.objective} />
+        </CollapsibleSection>
 
-          <Separator />
+        <Separator />
 
-          <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-            <Users2 size={16} className="text-muted-foreground" />
-            Criterios Generales
-          </div>
-
-          <FieldGroup className="gap-3">
+        <CollapsibleSection icon={Users2} title="Criterios Generales">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Field>
               <FieldLabel>Seleccionar Ciudad</FieldLabel>
               <NativeSelect value={data.city} onChange={(e) => update({ city: e.target.value })}>
@@ -186,10 +215,7 @@ export function Step1Objective() {
             </Field>
             <Field>
               <FieldLabel>Seleccionar Canal</FieldLabel>
-              <NativeSelect
-                value={data.channel}
-                onChange={(e) => update({ channel: e.target.value, subchannel: '' })}
-              >
+              <NativeSelect value={data.channel} onChange={(e) => update({ channel: e.target.value, subchannel: '' })}>
                 <NativeSelectOption value="">Seleccionar Canal</NativeSelectOption>
                 {channelOptions.map((option) => (
                   <NativeSelectOption key={option.value} value={option.value}>
@@ -209,28 +235,8 @@ export function Step1Objective() {
                 ))}
               </NativeSelect>
             </Field>
-          </FieldGroup>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {objectiveOptions.map((option) => (
-            <IconOptionCard
-              key={option.value}
-              icon={option.icon}
-              title={option.title}
-              description={option.description}
-              selected={data.objective === option.value}
-              onClick={() =>
-                update({
-                  objective: option.value,
-                  // Cada objetivo tiene su propio set de condiciones (Step2Targeting), así que al
-                  // cambiarlo las condiciones ya agregadas dejan de tener sentido y se reinician.
-                  conditions: data.objective === option.value ? data.conditions : [createDefaultCondition(option.value)],
-                })
-              }
-            />
-          ))}
-        </div>
+          </div>
+        </CollapsibleSection>
       </div>
     </div>
   )

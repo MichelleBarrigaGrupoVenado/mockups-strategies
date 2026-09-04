@@ -46,12 +46,20 @@ function compareNumeric(clientValue: number, operator: ConditionOperator, target
  */
 function matchesCondition(client: TargetClient, condition: TargetingCondition): boolean {
   switch (condition.field) {
-    case 'Ventas históricas':
+    case 'Ventas históricas': {
+      const numeric = Number(condition.value.replace(/[.,]/g, ''))
+      if (Number.isNaN(numeric)) return true
+      return compareNumeric(client.ticketPromedio, condition.operator, numeric)
+    }
+    // "Ticket" (Incrementar ticket / Recuperar clientes) y "Ticket promedio del Origen" (Incrementar
+    // portafolio) se evalúan contra el ticket del segmento/origen de la estrategia, no el ticket
+    // general del cliente — dos clientes con el mismo gasto total pueden diferir mucho en cuánto le
+    // compran justo al segmento que la estrategia está apuntando.
     case 'Ticket':
     case 'Ticket promedio del Origen': {
       const numeric = Number(condition.value.replace(/[.,]/g, ''))
       if (Number.isNaN(numeric)) return true
-      return compareNumeric(client.ticketPromedio, condition.operator, numeric)
+      return compareNumeric(client.ticketPromedioSegmento, condition.operator, numeric)
     }
     case 'Última Compra':
     case 'Última Compra del Origen': {

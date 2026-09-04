@@ -103,7 +103,7 @@ const products: ProductRefItem[] = [
 ]
 
 export const productLevelOptions: { value: ProductLevel; label: string }[] = [
-  { value: 'canal', label: 'Canal' },
+  { value: 'canal', label: 'Sector' },
   { value: 'marca', label: 'Marca' },
   { value: 'categoria', label: 'Categoría' },
   { value: 'grupo', label: 'Grupo' },

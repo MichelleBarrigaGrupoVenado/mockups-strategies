@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Field, FieldLabel } from '@/components/ui/field'
+import { PaginationBar } from '@/components/ui/pagination-bar'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useTargetClients } from '@/features/strategies/api/useStrategies'
 import { AddClientSearch } from '@/features/strategies/components/AddClientSearch'
@@ -12,7 +13,10 @@ import { SelectClientsMapDialog } from '@/features/strategies/components/map/Sel
 import { ConditionFieldKind, getConditionFields, monthsOptions } from '@/features/strategies/data/condition-fields'
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
 import { ConditionJoin, ConditionOperator } from '@/features/strategies/types'
+import { usePagination } from '@/shared/hooks/use-pagination'
 import { formatBs, formatDate } from '@/shared/utils/format'
+
+const CLIENTS_PAGE_SIZE = 8
 
 const operatorLabels: Record<ConditionOperator, string> = {
   [ConditionOperator.GreaterThan]: '>',
@@ -61,6 +65,8 @@ export function Step2Targeting() {
       .filter((client) => !displayedIds.has(client.id))
       .map((client) => ({ value: client.id, label: client.name }))
   }, [candidatePool, displayedClients])
+
+  const { page, setPage, totalPages, total, paginatedItems: pagedClients, rangeStart, rangeEnd } = usePagination(displayedClients, CLIENTS_PAGE_SIZE)
 
   function handleAddClient(clientId: string) {
     update({
@@ -142,10 +148,10 @@ export function Step2Targeting() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {displayedClients.map((client, i) => (
+              {pagedClients.map((client, i) => (
                 <TableRow key={client.id}>
                   <TableCell className="font-medium text-foreground">
-                    {i === 0 && <span className="mr-1.5 inline-block size-1.5 rounded-full bg-primary align-middle" />}
+                    {page === 1 && i === 0 && <span className="mr-1.5 inline-block size-1.5 rounded-full bg-primary align-middle" />}
                     {client.name}
                   </TableCell>
                   <TableCell>{formatBs(client.ticketPromedio)}</TableCell>
@@ -166,7 +172,7 @@ export function Step2Targeting() {
                 </TableRow>
               ))}
 
-              {displayedClients.length === 0 && (
+              {total === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="py-6 text-center text-sm text-muted-foreground">
                     Ningún cliente cumple los criterios definidos.
@@ -175,6 +181,10 @@ export function Step2Targeting() {
               )}
             </TableBody>
           </Table>
+
+          {total > 0 && (
+            <PaginationBar page={page} totalPages={totalPages} total={total} rangeStart={rangeStart} rangeEnd={rangeEnd} onPageChange={setPage} itemLabel="clientes" />
+          )}
         </div>
 
         <Button className="w-full" onClick={() => setMapDialogOpen(true)}>

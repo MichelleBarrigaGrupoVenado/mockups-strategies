@@ -3,10 +3,14 @@ import { useState } from 'react'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
+import { PaginationBar } from '@/components/ui/pagination-bar'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useTargetClients } from '@/features/strategies/api/useStrategies'
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
+import { usePagination } from '@/shared/hooks/use-pagination'
 import { formatBs, formatDate } from '@/shared/utils/format'
+
+const CLIENTS_PAGE_SIZE = 8
 
 type ClientMetaOverrides = Record<
   string,
@@ -26,6 +30,7 @@ export function Step3Kpi() {
     selectedClientIds: data.selectedClientIds,
   })
   const [metaOverrides, setMetaOverrides] = useState<ClientMetaOverrides>({})
+  const { page, setPage, totalPages, total, paginatedItems: pagedClients, rangeStart, rangeEnd } = usePagination(clients, CLIENTS_PAGE_SIZE)
 
   const calculateMeta = (ticketPromedio: number, percent: number) => {
     return ticketPromedio * (1 + percent / 100)
@@ -105,57 +110,63 @@ export function Step3Kpi() {
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-foreground">Clientes en el mapa</span>
-              <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">{clients?.length ?? 0} clientes</span>
+              <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">{total} clientes</span>
             </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Última compra</TableHead>
-                  <TableHead>Última visita</TableHead>
-                  <TableHead>Ticket prom.</TableHead>
-                  <TableHead>Meta mín.</TableHead>
-                  <TableHead>Meta máx.</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {clients?.map((client) => (
-                  <TableRow key={client.id}>
-                    <TableCell className="font-medium text-foreground">{client.name}</TableCell>
-                    <TableCell>{formatDate(client.ultimaCompra)}</TableCell>
-                    <TableCell>{client.ultimaVisita ? formatDate(client.ultimaVisita) : '—'}</TableCell>
-                    <TableCell>{formatBs(client.ticketPromedio)}</TableCell>
-                    <TableCell>
-                      <InputGroup className="w-32">
-                        <InputGroupAddon align="inline-start">Bs</InputGroupAddon>
-                        <InputGroupInput
-                          type="number"
-                          min="0"
-                          value={getMetaMin(client)}
-                          onChange={(e) =>
-                            updateClientMeta(client.id, 'metaMin', e.target.value)
-                          }
-                        />
-                      </InputGroup>
-                    </TableCell>
-
-                    <TableCell>
-                      <InputGroup className="w-32">
-                        <InputGroupAddon align="inline-start">Bs</InputGroupAddon>
-                        <InputGroupInput
-                          type="number"
-                          min="0"
-                          value={getMetaMax(client)}
-                          onChange={(e) =>
-                            updateClientMeta(client.id, 'metaMax', e.target.value)
-                          }
-                        />
-                      </InputGroup>
-                    </TableCell>
+            <div className="overflow-hidden rounded-lg border border-border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead>Última compra</TableHead>
+                    <TableHead>Última visita</TableHead>
+                    <TableHead>Ticket prom.</TableHead>
+                    <TableHead>Meta mín.</TableHead>
+                    <TableHead>Meta máx.</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {pagedClients.map((client) => (
+                    <TableRow key={client.id}>
+                      <TableCell className="font-medium text-foreground">{client.name}</TableCell>
+                      <TableCell>{formatDate(client.ultimaCompra)}</TableCell>
+                      <TableCell>{client.ultimaVisita ? formatDate(client.ultimaVisita) : '—'}</TableCell>
+                      <TableCell>{formatBs(client.ticketPromedio)}</TableCell>
+                      <TableCell>
+                        <InputGroup className="w-32">
+                          <InputGroupAddon align="inline-start">Bs</InputGroupAddon>
+                          <InputGroupInput
+                            type="number"
+                            min="0"
+                            value={getMetaMin(client)}
+                            onChange={(e) =>
+                              updateClientMeta(client.id, 'metaMin', e.target.value)
+                            }
+                          />
+                        </InputGroup>
+                      </TableCell>
+
+                      <TableCell>
+                        <InputGroup className="w-32">
+                          <InputGroupAddon align="inline-start">Bs</InputGroupAddon>
+                          <InputGroupInput
+                            type="number"
+                            min="0"
+                            value={getMetaMax(client)}
+                            onChange={(e) =>
+                              updateClientMeta(client.id, 'metaMax', e.target.value)
+                            }
+                          />
+                        </InputGroup>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              {total > 0 && (
+                <PaginationBar page={page} totalPages={totalPages} total={total} rangeStart={rangeStart} rangeEnd={rangeEnd} onPageChange={setPage} itemLabel="clientes" />
+              )}
+            </div>
           </div>
         </div>
 
