@@ -1,3 +1,5 @@
+import type { PriceRuleDraft } from '@/features/price-rules/types'
+
 export const StrategyObjective = {
   IncreaseTicket: 'increase_ticket',
   IncreasePortfolio: 'increase_portfolio',
@@ -81,6 +83,7 @@ export interface PointsRule {
 export const ClientIncentiveType = {
   PurchaseAmount: 'purchase_amount',
   Product: 'product',
+  Compliance: 'compliance',
 } as const
 
 export type ClientIncentiveType =
@@ -143,12 +146,16 @@ export interface StrategyWizardData {
   clientIncentiveEnabled: boolean
   clientIncentiveType: ClientIncentiveType
   pointsRules: PointsRule[]
+  /** Rangos de cumplimiento (100%–150%) usados cuando `clientIncentiveType` es `Compliance`. */
+  clientComplianceRules: ComplianceRule[]
   productPointsRules: ProductPointsRule[]
   pointsExpire: boolean
   pointsExpirationDate?: string
   employeeIncentiveEnabled: boolean
   complianceRules: ComplianceRule[]
   priceRuleIncentiveEnabled: boolean
+  /** Regla de precios creada desde el paso 5 (`CreatePriceRulePage`); `null` = todavía no se creó ninguna. */
+  priceRule: PriceRuleDraft | null
 }
 
 export interface StrategySummary {

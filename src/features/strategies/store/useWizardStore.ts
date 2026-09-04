@@ -34,16 +34,24 @@ const initialData: StrategyWizardData = {
   ],
   actionDetail: '',
   clientIncentiveEnabled: true,
-  clientIncentiveType: ClientIncentiveType.PurchaseAmount,
+  // El selector de tipo está oculto por ahora en Step5Incentive (ver SHOW_CLIENT_INCENTIVE_TYPE_PICKER) —
+  // "Por cumplimiento" es el único tipo visible, así que es el único default que tiene sentido.
+  clientIncentiveType: ClientIncentiveType.Compliance,
   pointsRules: [
     { id: crypto.randomUUID(), amountBs: 100, points: 10 },
     { id: crypto.randomUUID(), amountBs: 200, points: 25 },
+  ],
+  clientComplianceRules: [
+    { id: crypto.randomUUID(), percent: 100, points: 200 },
+    { id: crypto.randomUUID(), percent: 120, points: 300 },
+    { id: crypto.randomUUID(), percent: 150, points: 500 },
   ],
   productPointsRules: [],
   pointsExpire: false,
   employeeIncentiveEnabled: true,
   complianceRules: [{ id: crypto.randomUUID(), percent: 100, points: 0 }],
   priceRuleIncentiveEnabled: false,
+  priceRule: null,
 }
 
 interface WizardState {
@@ -57,6 +65,10 @@ interface WizardState {
   addPointsRule: () => void
   removePointsRule: (id: string) => void
   updatePointsRule: (id: string, patch: Partial<{ amountBs: number; points: number }>) => void
+  addClientComplianceRule: () => void
+  removeClientComplianceRule: (id: string) => void
+  updateClientComplianceRule: (id: string, patch: Partial<{ percent: number; points: number }>) => void
+  updateComplianceRule: (id: string, patch: Partial<{ percent: number; points: number }>) => void
   reset: () => void
 }
 
@@ -83,6 +95,20 @@ export const useWizardStore = create<WizardState>((set) => ({
   updatePointsRule: (id, patch) =>
     set((s) => ({
       data: { ...s.data, pointsRules: s.data.pointsRules.map((r) => (r.id === id ? { ...r, ...patch } : r)) },
+    })),
+  addClientComplianceRule: () =>
+    set((s) => ({
+      data: { ...s.data, clientComplianceRules: [...s.data.clientComplianceRules, { id: crypto.randomUUID(), percent: 100, points: 0 }] },
+    })),
+  removeClientComplianceRule: (id) =>
+    set((s) => ({ data: { ...s.data, clientComplianceRules: s.data.clientComplianceRules.filter((r) => r.id !== id) } })),
+  updateClientComplianceRule: (id, patch) =>
+    set((s) => ({
+      data: { ...s.data, clientComplianceRules: s.data.clientComplianceRules.map((r) => (r.id === id ? { ...r, ...patch } : r)) },
+    })),
+  updateComplianceRule: (id, patch) =>
+    set((s) => ({
+      data: { ...s.data, complianceRules: s.data.complianceRules.map((r) => (r.id === id ? { ...r, ...patch } : r)) },
     })),
   reset: () => set({ step: 0, data: initialData }),
 }))

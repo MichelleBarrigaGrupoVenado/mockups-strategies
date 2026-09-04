@@ -21,6 +21,11 @@ import {
   ProductUnitType,
 } from '@/features/strategies/types'
 
+// "Por cumplimiento" es hoy el único tipo de incentivo para clientes que se ofrece — el selector y los
+// paneles de "Por monto de compra" / "Por producto" quedan listos pero ocultos por si se reactivan más
+// adelante, en vez de borrarlos.
+const SHOW_CLIENT_INCENTIVE_TYPE_PICKER = false
+
 const mockProducts = [
   {
     id: 'p1',
@@ -56,6 +61,10 @@ export function Step5Incentive() {
     addPointsRule,
     removePointsRule,
     updatePointsRule,
+    addClientComplianceRule,
+    removeClientComplianceRule,
+    updateClientComplianceRule,
+    updateComplianceRule,
   } = useWizardStore()
 
   const navigate = useNavigate()
@@ -137,7 +146,8 @@ export function Step5Incentive() {
 
       {data.clientIncentiveEnabled && (
         <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
-          {/* TIPO DE INCENTIVO */}
+          {/* TIPO DE INCENTIVO — oculto: ver SHOW_CLIENT_INCENTIVE_TYPE_PICKER arriba. */}
+          {SHOW_CLIENT_INCENTIVE_TYPE_PICKER && (
           <div className="flex flex-col gap-3">
             <span className="text-sm font-semibold text-foreground">
               Tipo de incentivo
@@ -151,7 +161,7 @@ export function Step5Incentive() {
                     value as ClientIncentiveType,
                 })
               }
-              className="grid grid-cols-1 gap-3 md:grid-cols-2"
+              className="grid grid-cols-1 gap-3 md:grid-cols-3"
             >
               <Label
                 htmlFor="incentive-purchase"
@@ -194,11 +204,34 @@ export function Step5Incentive() {
                   </span>
                 </div>
               </Label>
+
+              <Label
+                htmlFor="incentive-compliance"
+                className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4"
+              >
+                <RadioGroupItem
+                  id="incentive-compliance"
+                  value={ClientIncentiveType.Compliance}
+                />
+
+                <div className="flex flex-col gap-1">
+                  <span className="font-medium">
+                    Por cumplimiento
+                  </span>
+
+                  <span className="text-xs text-muted-foreground">
+                    El cliente recibe puntos según su % de cumplimiento
+                    de la meta (100% a 150%).
+                  </span>
+                </div>
+              </Label>
             </RadioGroup>
           </div>
+          )}
 
-          {/* POR MONTO */}
-          {data.clientIncentiveType ===
+          {/* POR MONTO — oculto: ver SHOW_CLIENT_INCENTIVE_TYPE_PICKER arriba. */}
+          {SHOW_CLIENT_INCENTIVE_TYPE_PICKER &&
+            data.clientIncentiveType ===
             ClientIncentiveType.PurchaseAmount && (
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
@@ -295,8 +328,124 @@ export function Step5Incentive() {
             </div>
           )}
 
-          {/* POR PRODUCTO */}
+          {/* POR CUMPLIMIENTO */}
           {data.clientIncentiveType ===
+            ClientIncentiveType.Compliance && (
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-semibold text-foreground">
+                    Rangos de Cumplimiento
+                  </span>
+
+                  <span className="text-xs text-muted-foreground">
+                    Define los puntos según el % de cumplimiento de la meta alcanzado (100% a 150%).
+                  </span>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary hover:text-primary"
+                  onClick={addClientComplianceRule}
+                >
+                  <Plus data-icon="inline-start" />
+                  Agregar Rango
+                </Button>
+              </div>
+
+              <div className="overflow-hidden rounded-lg border border-border">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                    <tr>
+                      <th className="px-3 py-2 text-left">
+                        Cumplimiento (%)
+                      </th>
+
+                      <th className="px-3 py-2 text-left">
+                        Puntos ganados
+                      </th>
+
+                      <th className="w-10" />
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {data.clientComplianceRules.map((rule) => (
+                      <tr
+                        key={rule.id}
+                        className="border-t border-border"
+                      >
+                        <td className="px-3 py-2">
+                          <div className="flex items-center gap-2">
+                            <span className="size-1.5 shrink-0 rounded-full bg-primary" />
+
+                            <Input
+                              type="number"
+                              min={100}
+                              max={150}
+                              className="h-8 w-28"
+                              value={rule.percent}
+                              onChange={(e) =>
+                                updateClientComplianceRule(rule.id, {
+                                  percent: Number(e.target.value),
+                                })
+                              }
+                              onBlur={(e) => {
+                                const clamped = Math.min(
+                                  150,
+                                  Math.max(100, Number(e.target.value) || 100),
+                                )
+
+                                updateClientComplianceRule(rule.id, {
+                                  percent: clamped,
+                                })
+                              }}
+                            />
+
+                            <span className="text-muted-foreground">
+                              %
+                            </span>
+                          </div>
+                        </td>
+
+                        <td className="px-3 py-2">
+                          <Input
+                            type="number"
+                            min="0"
+                            className="h-8 w-28"
+                            value={rule.points}
+                            onChange={(e) =>
+                              updateClientComplianceRule(rule.id, {
+                                points: Number(e.target.value),
+                              })
+                            }
+                          />
+                        </td>
+
+                        <td className="px-3 py-2 text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="text-muted-foreground hover:text-destructive"
+                            onClick={() =>
+                              removeClientComplianceRule(rule.id)
+                            }
+                          >
+                            <Trash2 size={15} />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* POR PRODUCTO — oculto: ver SHOW_CLIENT_INCENTIVE_TYPE_PICKER arriba. */}
+          {SHOW_CLIENT_INCENTIVE_TYPE_PICKER &&
+            data.clientIncentiveType ===
             ClientIncentiveType.Product && (
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
@@ -592,6 +741,10 @@ export function Step5Incentive() {
             Nivel de Cumplimiento para Empleado
           </span>
 
+          <span className="-mt-2 text-xs text-muted-foreground">
+            El cumplimiento del empleado se evalúa siempre al 100% de la meta; solo se define cuántos puntos gana al alcanzarla.
+          </span>
+
           <div className="overflow-hidden rounded-lg border border-border">
             <table className="w-full text-sm">
               <thead className="bg-muted text-xs font-semibold tracking-wide text-muted-foreground uppercase">
@@ -603,8 +756,6 @@ export function Step5Incentive() {
                   <th className="px-3 py-2 text-left">
                     Puntos ganados
                   </th>
-
-                  <th className="w-10" />
                 </tr>
               </thead>
 
@@ -621,7 +772,8 @@ export function Step5Incentive() {
                         <Input
                           type="number"
                           className="h-8 w-28"
-                          defaultValue={rule.percent}
+                          value={rule.percent}
+                          disabled
                         />
 
                         <span className="text-muted-foreground">
@@ -633,19 +785,15 @@ export function Step5Incentive() {
                     <td className="px-3 py-2">
                       <Input
                         type="number"
+                        min="0"
                         className="h-8 w-28"
-                        defaultValue={rule.points}
+                        value={rule.points}
+                        onChange={(e) =>
+                          updateComplianceRule(rule.id, {
+                            points: Number(e.target.value),
+                          })
+                        }
                       />
-                    </td>
-
-                    <td className="px-3 py-2 text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 size={15} />
-                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -689,15 +837,37 @@ export function Step5Incentive() {
             </span>
           </div>
 
-          <Button
-            type="button"
-            variant="outline"
-            className="w-fit"
-            onClick={() => navigate('/estrategias/crear/regla-precios')}
-          >
-            Crear regla de precios
-            <ArrowRight data-icon="inline-end" />
-          </Button>
+          {data.priceRule ? (
+            <div className="flex flex-col gap-2">
+              <div className="rounded-lg bg-muted px-3 py-2.5 text-xs text-muted-foreground">
+                La regla de precios{' '}
+                <span className="font-semibold text-foreground">
+                  "{data.priceRule.name}"
+                </span>{' '}
+                podrá ser utilizada una vez el cliente cumpla con el objetivo.
+              </div>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="w-fit text-primary hover:text-primary"
+                onClick={() => navigate('/estrategias/crear/regla-precios')}
+              >
+                Editar regla de precios
+              </Button>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-fit"
+              onClick={() => navigate('/estrategias/crear/regla-precios')}
+            >
+              Crear regla de precios
+              <ArrowRight data-icon="inline-end" />
+            </Button>
+          )}
         </div>
       )}
     </div>
