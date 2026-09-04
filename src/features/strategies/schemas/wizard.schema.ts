@@ -16,8 +16,7 @@ export const targetingStepSchema = z.object({
 
 export const kpiStepSchema = z.object({
   kpiPrincipal: z.string().min(1, 'Selecciona un KPI'),
-  metaMinPercent: z.number(),
-  metaMaxPercent: z.number(),
+  metaPercent: z.number(),
 })
 
 export const actionStepSchema = z.object({

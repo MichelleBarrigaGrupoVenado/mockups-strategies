@@ -24,3 +24,15 @@ export function addMonthsIso(dateIso: string, months: number): string {
   date.setMonth(date.getMonth() + months)
   return date.toISOString().split('T')[0]
 }
+
+/** Primer día del mes siguiente al actual, en formato `yyyy-mm-dd`. */
+export function firstOfNextMonthIso(): string {
+  const now = new Date()
+  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+  return nextMonth.toISOString().split('T')[0]
+}
+
+/** Meses de recompra consecutiva, ej. `3` -> `"3m"`. */
+export function formatFrequency(meses: number): string {
+  return `${meses}m`
+}

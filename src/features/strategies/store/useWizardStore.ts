@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import { createDefaultCondition } from '@/features/strategies/data/condition-fields'
 import { ActionType, ClientIncentiveType, ConditionJoin, ConditionOperator, type StrategyWizardData, type TargetingCondition } from '@/features/strategies/types'
-import { addMonthsIso, todayIso } from '@/shared/utils/format'
+import { addMonthsIso, firstOfNextMonthIso } from '@/shared/utils/format'
 
-const defaultStartDate = todayIso()
+const defaultStartDate = firstOfNextMonthIso()
 
 const initialData: StrategyWizardData = {
   objective: null,
@@ -11,11 +11,8 @@ const initialData: StrategyWizardData = {
   description: '',
   startDate: defaultStartDate,
   endDate: addMonthsIso(defaultStartDate, 3),
-  productLevel: '',
   productLevelValues: [],
-  productLevelA: '',
   productLevelValuesA: [],
-  productLevelB: '',
   productLevelValuesB: [],
   city: '',
   channel: '',
@@ -27,8 +24,7 @@ const initialData: StrategyWizardData = {
   excludedClientIds: [],
   manuallyAddedClientIds: [],
   kpiPrincipal: 'Ticket promedio',
-  metaMinPercent: 10,
-  metaMaxPercent: 20,
+  metaPercent: 15,
   actionTypes: [
     ActionType.RecommendProducts,
   ],

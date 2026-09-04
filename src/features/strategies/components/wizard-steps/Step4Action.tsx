@@ -79,8 +79,8 @@ export function Step4Action() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h2 className="text-lg font-semibold text-foreground">¿Qué quieres que haga el equipo comercial?</h2>
-        <p className="text-sm text-muted-foreground">Selecciona una acción sugerida para la fuerza de ventas o define una personalizada.</p>
+        <h2 className="text-lg font-semibold text-foreground">¿Qué quieres que haga la estrategia?</h2>
+        <p className="text-sm text-muted-foreground">Selecciona una acción sugerida para la estrategia tenga efectos medibles.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -100,7 +100,7 @@ export function Step4Action() {
         <FieldLabel className="flex items-center gap-2 text-sm font-semibold text-foreground">
           Recomendación detallada
         </FieldLabel>
-        <p className="text-sm text-muted-foreground">Redacta la instrucción exacta que recibirá el equipo comercial. Sé específico.</p>
+        <p className="text-sm text-muted-foreground">Redacta la instrucción exacta que recibirán los vendedores. Sé específico.</p>
         <Field>
           <Textarea
             rows={4}

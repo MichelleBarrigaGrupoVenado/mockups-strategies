@@ -62,10 +62,8 @@ function ProductSegmentSection({ objective }: { objective: StrategyObjective | n
           <span className="text-xs font-semibold text-primary uppercase">Segmento Origen — que ya compran</span>
           <ProductLevelField
             levelLabel="Nivel del segmento origen"
-            valueLabel="Buscar segmento origen"
-            level={data.productLevelA}
+            valueLabel="Segmento origen seleccionado"
             values={data.productLevelValuesA}
-            onLevelChange={(level) => update({ productLevelA: level })}
             onValuesChange={(values) => update({ productLevelValuesA: values })}
           />
         </FieldGroup>
@@ -78,10 +76,8 @@ function ProductSegmentSection({ objective }: { objective: StrategyObjective | n
           <span className="text-xs font-semibold text-primary uppercase">Segmento Objetivo — que queremos que compren</span>
           <ProductLevelField
             levelLabel="Nivel del segmento objetivo"
-            valueLabel="Buscar segmento objetivo"
-            level={data.productLevelB}
+            valueLabel="Segmento objetivo seleccionado"
             values={data.productLevelValuesB}
-            onLevelChange={(level) => update({ productLevelB: level })}
             onValuesChange={(values) => update({ productLevelValuesB: values })}
           />
         </FieldGroup>
@@ -106,9 +102,7 @@ function ProductSegmentSection({ objective }: { objective: StrategyObjective | n
       <ProductLevelField
         levelLabel="Seleccionar nivel de productos"
         valueLabel={objective ? (labelByObjective[objective] ?? 'Buscar producto') : 'Buscar producto'}
-        level={data.productLevel}
         values={data.productLevelValues}
-        onLevelChange={(level) => update({ productLevel: level })}
         onValuesChange={(values) => update({ productLevelValues: values })}
         hint={objective ? hintByObjective[objective] : undefined}
       />

@@ -111,6 +111,9 @@ export const productLevelOptions: { value: ProductLevel; label: string }[] = [
   { value: 'producto', label: 'Producto' },
 ]
 
+/** Orden jerárquico de `ProductLevel`, de la raíz (sector) a las hojas (producto). */
+export const productLevelOrder: ProductLevel[] = ['canal', 'marca', 'categoria', 'grupo', 'familia', 'producto']
+
 const dataByLevel: Record<ProductLevel, ProductRefItem[]> = {
   canal: channels,
   marca: brands,
@@ -132,4 +135,57 @@ export function getProductBreadcrumb(productId: string): string {
   const family = families.find((item) => item.id === product.parentId)
   const group = family ? groups.find((item) => item.id === family.parentId) : undefined
   return [group?.name, family?.name].filter(Boolean).join(' / ')
+}
+
+interface ProductNode extends ProductRefItem {
+  level: ProductLevel
+}
+
+function findNode(id: string): ProductNode | undefined {
+  for (const level of productLevelOrder) {
+    const item = dataByLevel[level].find((node) => node.id === id)
+    if (item) return { ...item, level }
+  }
+  return undefined
+}
+
+export function getProductNodeLevel(id: string): ProductLevel | undefined {
+  return findNode(id)?.level
+}
+
+/**
+ * Ruta completa raíz -> nodo (ej. Sector / Marca / Familia) de cualquier id de la jerarquía, sin
+ * importar su nivel — usado para mostrar chips como "MARCAS CUIDADO PERSONAL... / LIMPIEZA HOGAR"
+ * cuando se seleccionan nodos de distintos niveles dentro de un mismo segmento.
+ */
+export function getProductNodePath(id: string): ProductNode[] {
+  const path: ProductNode[] = []
+  let current = findNode(id)
+  while (current) {
+    path.unshift(current)
+    current = current.parentId ? findNode(current.parentId) : undefined
+  }
+  return path
+}
+
+/** `true` si `id` es `ancestorId` mismo o desciende de él, sin importar cuántos niveles de distancia. */
+export function isDescendantOf(id: string, ancestorId: string): boolean {
+  let current = findNode(id)
+  while (current) {
+    if (current.id === ancestorId) return true
+    current = current.parentId ? findNode(current.parentId) : undefined
+  }
+  return false
+}
+
+/**
+ * Opciones de `level`, acotadas a los descendientes de `ancestorId` sin importar cuántos niveles de
+ * distancia (ej. todas las familias de la marca Bristar, saltándose Categoría y Grupo). Sin
+ * `ancestorId` devuelve todos los nodos de ese nivel — así se puede elegir un nivel "de una" sin verse
+ * obligado a completar cada nivel intermedio.
+ */
+export function getDescendantOptions(level: ProductLevel | '', ancestorId?: string): { value: string; label: string }[] {
+  if (!level) return []
+  const items = ancestorId ? dataByLevel[level].filter((item) => isDescendantOf(item.id, ancestorId)) : dataByLevel[level]
+  return items.map((item) => ({ value: item.id, label: item.name }))
 }

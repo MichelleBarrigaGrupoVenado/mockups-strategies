@@ -1,11 +1,11 @@
 import { MapPinned, Plus, Trash2, UserPlus, X } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { PaginationBar } from '@/components/ui/pagination-bar'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { useTargetClients } from '@/features/strategies/api/useStrategies'
+import { useDisplayedTargetClients } from '@/features/strategies/api/useDisplayedTargetClients'
 import { AddClientSearch } from '@/features/strategies/components/AddClientSearch'
 import { ConditionRow } from '@/features/strategies/components/ConditionRow'
 import { ClientsMap } from '@/features/strategies/components/map/ClientsMap'
@@ -14,7 +14,7 @@ import { ConditionFieldKind, getConditionFields, monthsOptions } from '@/feature
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
 import { ConditionJoin, ConditionOperator } from '@/features/strategies/types'
 import { usePagination } from '@/shared/hooks/use-pagination'
-import { formatBs, formatDate } from '@/shared/utils/format'
+import { formatBs, formatDate, formatFrequency } from '@/shared/utils/format'
 
 const CLIENTS_PAGE_SIZE = 8
 
@@ -28,60 +28,12 @@ export function Step2Targeting() {
   const { data, addCondition, removeCondition, updateCondition, update } = useWizardStore()
   const [mapDialogOpen, setMapDialogOpen] = useState(false)
 
-  const baseFilters = { city: data.city, channel: data.channel, subchannel: data.subchannel, conditions: data.conditions }
-  /** Todo lo que cumple ciudad/canal/subcanal/condiciones, sin acotar por polígono — el pool del que se puede "agregar cliente" de vuelta. */
-  const { data: candidatePool } = useTargetClients(baseFilters)
-  /** Lo que arroja el modo activo (filtro automático o polígono dibujado a mano), antes de excluir/agregar clientes puntuales. */
-  const { data: autoOrPolygonClients } = useTargetClients({ ...baseFilters, selectedClientIds: data.selectedClientIds })
+  const { candidatePool, displayedClients, addableClientOptions, handleAddClient, handleRemoveClient } = useDisplayedTargetClients()
 
   const hasManualSelection = !!data.selectedClientIds
   const conditionFields = getConditionFields(data.objective)
 
-  // Resultado final mostrado: el grupo activo, menos lo quitado a mano, más lo re-agregado a mano
-  // (por ejemplo un cliente que cumple las condiciones pero quedó fuera del polígono dibujado).
-  const displayedClients = useMemo(() => {
-    const base = autoOrPolygonClients ?? []
-    const excluded = new Set(data.excludedClientIds)
-    const list = base.filter((client) => !excluded.has(client.id))
-
-    const presentIds = new Set(list.map((client) => client.id))
-    const pool = candidatePool ?? []
-
-    for (const id of data.manuallyAddedClientIds) {
-      if (presentIds.has(id)) continue
-      const client = pool.find((c) => c.id === id)
-      if (client) {
-        list.push(client)
-        presentIds.add(id)
-      }
-    }
-
-    return list
-  }, [autoOrPolygonClients, candidatePool, data.excludedClientIds, data.manuallyAddedClientIds])
-
-  const addableClientOptions = useMemo(() => {
-    const displayedIds = new Set(displayedClients.map((client) => client.id))
-    return (candidatePool ?? [])
-      .filter((client) => !displayedIds.has(client.id))
-      .map((client) => ({ value: client.id, label: client.name }))
-  }, [candidatePool, displayedClients])
-
   const { page, setPage, totalPages, total, paginatedItems: pagedClients, rangeStart, rangeEnd } = usePagination(displayedClients, CLIENTS_PAGE_SIZE)
-
-  function handleAddClient(clientId: string) {
-    update({
-      manuallyAddedClientIds: [...data.manuallyAddedClientIds, clientId],
-      excludedClientIds: data.excludedClientIds.filter((id) => id !== clientId),
-    })
-  }
-
-  function handleRemoveClient(clientId: string) {
-    if (data.manuallyAddedClientIds.includes(clientId)) {
-      update({ manuallyAddedClientIds: data.manuallyAddedClientIds.filter((id) => id !== clientId) })
-      return
-    }
-    update({ excludedClientIds: [...data.excludedClientIds, clientId] })
-  }
 
   const summary = data.conditions
     .map((c, i) => {
@@ -143,7 +95,7 @@ export function Step2Targeting() {
                 <TableHead>Ticket prom. segmento</TableHead>
                 <TableHead>Última compra</TableHead>
                 <TableHead>Última visita</TableHead>
-                <TableHead>Frecuencia compra</TableHead>
+                <TableHead>Recompra</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
@@ -250,8 +202,4 @@ export function Step2Targeting() {
       />
     </div>
   )
-}
-
-function formatFrequency(comprasPorMes: number): string {
-  return `${comprasPorMes} ${comprasPorMes === 1 ? 'compra/mes' : 'compras/mes'}`
 }

@@ -1,65 +1,37 @@
-import { BarChart3 } from 'lucide-react'
+import { BarChart3, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { PaginationBar } from '@/components/ui/pagination-bar'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { useTargetClients } from '@/features/strategies/api/useStrategies'
+import { useDisplayedTargetClients } from '@/features/strategies/api/useDisplayedTargetClients'
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
 import { usePagination } from '@/shared/hooks/use-pagination'
-import { formatBs, formatDate } from '@/shared/utils/format'
+import { formatBs, formatDate, formatFrequency } from '@/shared/utils/format'
 
 const CLIENTS_PAGE_SIZE = 8
 
-type ClientMetaOverrides = Record<
-  string,
-  {
-    metaMin?: number
-    metaMax?: number
-  }
->
+type ClientMetaOverrides = Record<string, number | undefined>
 
 export function Step3Kpi() {
   const { data, update } = useWizardStore()
-  const { data: clients } = useTargetClients({
-    city: data.city,
-    channel: data.channel,
-    subchannel: data.subchannel,
-    conditions: data.conditions,
-    selectedClientIds: data.selectedClientIds,
-  })
+  const { displayedClients, handleRemoveClient } = useDisplayedTargetClients()
   const [metaOverrides, setMetaOverrides] = useState<ClientMetaOverrides>({})
-  const { page, setPage, totalPages, total, paginatedItems: pagedClients, rangeStart, rangeEnd } = usePagination(clients, CLIENTS_PAGE_SIZE)
+  const { page, setPage, totalPages, total, paginatedItems: pagedClients, rangeStart, rangeEnd } = usePagination(displayedClients, CLIENTS_PAGE_SIZE)
 
   const calculateMeta = (ticketPromedio: number, percent: number) => {
     return ticketPromedio * (1 + percent / 100)
   }
 
-  const getMetaMin = (client: NonNullable<typeof clients>[number]) => {
-    return metaOverrides[client.id]?.metaMin
-      ?? calculateMeta(client.ticketPromedio, data.metaMinPercent)
+  const getMeta = (client: (typeof displayedClients)[number]) => {
+    return metaOverrides[client.id] ?? calculateMeta(client.ticketPromedio, data.metaPercent)
   }
 
-  const getMetaMax = (client: NonNullable<typeof clients>[number]) => {
-    return metaOverrides[client.id]?.metaMax
-      ?? calculateMeta(client.ticketPromedio, data.metaMaxPercent)
-  }
-
-  const updateClientMeta = (
-    clientId: string,
-    field: 'metaMin' | 'metaMax',
-    value: string,
-  ) => {
+  const updateClientMeta = (clientId: string, value: string) => {
     const numericValue = value === '' ? undefined : Number(value)
-
-    setMetaOverrides((prev) => ({
-      ...prev,
-      [clientId]: {
-        ...prev[clientId],
-        [field]: numericValue,
-      },
-    }))
+    setMetaOverrides((prev) => ({ ...prev, [clientId]: numericValue }))
   }
 
   return (
@@ -82,30 +54,17 @@ export function Step3Kpi() {
             </Field>
           </FieldGroup>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Field>
-              <FieldLabel>Rango de Meta Mínimo</FieldLabel>
-              <InputGroup>
-                <InputGroupInput
-                  type="number"
-                  value={data.metaMinPercent}
-                  onChange={(e) => update({ metaMinPercent: Number(e.target.value) })}
-                />
-                <InputGroupAddon align="inline-end">%</InputGroupAddon>
-              </InputGroup>
-            </Field>
-            <Field>
-              <FieldLabel>Rango de Meta Máximo</FieldLabel>
-              <InputGroup>
-                <InputGroupInput
-                  type="number"
-                  value={data.metaMaxPercent}
-                  onChange={(e) => update({ metaMaxPercent: Number(e.target.value) })}
-                />
-                <InputGroupAddon align="inline-end">%</InputGroupAddon>
-              </InputGroup>
-            </Field>
-          </div>
+          <Field>
+            <FieldLabel>% a incrementar</FieldLabel>
+            <InputGroup className="max-w-48">
+              <InputGroupInput
+                type="number"
+                value={data.metaPercent}
+                onChange={(e) => update({ metaPercent: Number(e.target.value) })}
+              />
+              <InputGroupAddon align="inline-end">%</InputGroupAddon>
+            </InputGroup>
+          </Field>
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
@@ -117,49 +76,55 @@ export function Step3Kpi() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Cliente</TableHead>
+                    <TableHead>Ticket prom. general</TableHead>
+                    <TableHead>Ticket prom. segmento</TableHead>
                     <TableHead>Última compra</TableHead>
                     <TableHead>Última visita</TableHead>
-                    <TableHead>Ticket prom.</TableHead>
-                    <TableHead>Meta mín.</TableHead>
-                    <TableHead>Meta máx.</TableHead>
+                    <TableHead>Recompra</TableHead>
+                    <TableHead>Meta</TableHead>
+                    <TableHead className="w-10" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {pagedClients.map((client) => (
                     <TableRow key={client.id}>
                       <TableCell className="font-medium text-foreground">{client.name}</TableCell>
-                      <TableCell>{formatDate(client.ultimaCompra)}</TableCell>
-                      <TableCell>{client.ultimaVisita ? formatDate(client.ultimaVisita) : '—'}</TableCell>
                       <TableCell>{formatBs(client.ticketPromedio)}</TableCell>
+                      <TableCell>{formatBs(client.ticketPromedioSegmento)}</TableCell>
+                      <TableCell>{formatDate(client.ultimaCompra)}</TableCell>
+                      <TableCell>{formatDate(client.ultimaVisita ?? client.ultimaCompra)}</TableCell>
+                      <TableCell>{formatFrequency(client.frecuenciaCompra)}</TableCell>
                       <TableCell>
                         <InputGroup className="w-32">
                           <InputGroupAddon align="inline-start">Bs</InputGroupAddon>
                           <InputGroupInput
                             type="number"
                             min="0"
-                            value={getMetaMin(client)}
-                            onChange={(e) =>
-                              updateClientMeta(client.id, 'metaMin', e.target.value)
-                            }
+                            value={getMeta(client)}
+                            onChange={(e) => updateClientMeta(client.id, e.target.value)}
                           />
                         </InputGroup>
                       </TableCell>
-
-                      <TableCell>
-                        <InputGroup className="w-32">
-                          <InputGroupAddon align="inline-start">Bs</InputGroupAddon>
-                          <InputGroupInput
-                            type="number"
-                            min="0"
-                            value={getMetaMax(client)}
-                            onChange={(e) =>
-                              updateClientMeta(client.id, 'metaMax', e.target.value)
-                            }
-                          />
-                        </InputGroup>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          className="text-muted-foreground hover:text-destructive"
+                          onClick={() => handleRemoveClient(client.id)}
+                        >
+                          <Trash2 size={15} />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
+
+                  {total === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={8} className="py-6 text-center text-sm text-muted-foreground">
+                        Ningún cliente cumple los criterios definidos.
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
 

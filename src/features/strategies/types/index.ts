@@ -55,7 +55,7 @@ export interface TargetClient {
   ticketPromedio: number
   /** Ticket promedio del cliente dentro del segmento de producto de la estrategia. */
   ticketPromedioSegmento: number
-  /** Compras por mes. */
+  /** Meses de recompra consecutiva ("Recompra" en la UI), ej. `3` = compró 3 meses seguidos. */
   frecuenciaCompra: number
   ultimaCompra: string
   ultimaVisita?: string
@@ -121,12 +121,13 @@ export interface StrategyWizardData {
   startDate: string
   /** yyyy-mm-dd — por defecto 3 meses después de `startDate`. */
   endDate: string
-  productLevel: string
-  /** Uno o más nodos de `productLevel` seleccionados (ej. Ketchup y Mostaza dentro de "Familia"). */
+  /**
+   * Nodos de la jerarquía de productos seleccionados, potencialmente de distintos niveles (ej. la marca
+   * Bristar completa más las familias "Limpieza Hogar" y "Limpieza Cocina" de esa misma marca). El nivel
+   * de cada id se resuelve buscándolo en `product-hierarchy.ts`.
+   */
   productLevelValues: string[]
-  productLevelA: string
   productLevelValuesA: string[]
-  productLevelB: string
   productLevelValuesB: string[]
   city: string
   channel: string
@@ -139,8 +140,8 @@ export interface StrategyWizardData {
   /** Ids agregados manualmente con el buscador (ej. un cliente que cumple las condiciones pero quedó fuera del polígono). */
   manuallyAddedClientIds: string[]
   kpiPrincipal: string
-  metaMinPercent: number
-  metaMaxPercent: number
+  /** % a incrementar sobre el ticket promedio para calcular la meta de cada cliente. */
+  metaPercent: number
   actionTypes: ActionType[]
   actionDetail: string
   clientIncentiveEnabled: boolean

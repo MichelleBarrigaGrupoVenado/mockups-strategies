@@ -94,7 +94,8 @@ export const mockTargetClients: TargetClient[] = rawTargetClients.map((client, i
     deuda,
     mora,
     ticketPromedioSegmento: Math.round(client.ticketPromedio * segmentRatio),
-    frecuenciaCompra: 1 + (index % 6),
+    // Meses de recompra consecutiva ("Recompra" en la UI): cuántos meses seguidos compró el cliente.
+    frecuenciaCompra: 1 + (index % 12),
   }
 })
 
