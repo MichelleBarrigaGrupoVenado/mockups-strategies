@@ -1,6 +1,5 @@
 import {
   FileText,
-  FlaskConical,
   Gauge,
   LayoutDashboard,
   Lightbulb,
@@ -11,6 +10,7 @@ import {
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/app/layout/AppLayout'
 import { PlaceholderPage } from '@/app/pages/PlaceholderPage'
+import { ExperimentSimulatorPage } from '@/features/experimentos/pages/ExperimentSimulatorPage'
 import { ResultDetailPage } from '@/features/results/pages/ResultDetailPage'
 import { ResultsListPage } from '@/features/results/pages/ResultsListPage'
 import { CreatePriceRulePage } from '@/features/strategies/pages/CreatePriceRulePage'
@@ -63,16 +63,7 @@ export function AppRouter() {
             />
           }
         />
-        <Route
-          path="experimentos"
-          element={
-            <PlaceholderPage
-              icon={FlaskConical}
-              title="Experimentos"
-              description="Pruebas A/B de estrategias comerciales."
-            />
-          }
-        />
+        <Route path="experimentos" element={<ExperimentSimulatorPage />} />
         <Route path="resultados">
           <Route index element={<ResultsListPage />} />
           <Route path=":id" element={<ResultDetailPage />} />

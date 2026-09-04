@@ -61,9 +61,9 @@ export function CreateStrategyPage() {
     }
 
     createStrategy.mutate(data, {
-      onSuccess: () => {
+      onSuccess: (created) => {
         toast.success('Estrategia creada correctamente.')
-        navigate('/estrategias')
+        navigate(`/estrategias/${created.id}`)
       },
     })
   }

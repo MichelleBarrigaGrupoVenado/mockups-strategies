@@ -1,9 +1,26 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { mockStrategyDetails, mockStrategySummaries, mockTargetClients } from '@/features/strategies/data/mock-data'
-import { ConditionOperator, type StrategyWizardData, type TargetClient, type TargetingCondition } from '@/features/strategies/types'
+import { channelOptions, cityOptions } from '@/features/strategies/data/criteria'
+import { mockStrategyDetails, mockStrategySummaries, mockTargetClients, objectiveLabels } from '@/features/strategies/data/mock-data'
+import {
+  StrategyObjective,
+  StrategyStatus,
+  ConditionOperator,
+  type StrategyDetail,
+  type StrategySummary,
+  type StrategyWizardData,
+  type TargetClient,
+  type TargetingCondition,
+} from '@/features/strategies/types'
+import { formatDate } from '@/shared/utils/format'
 
 const strategiesKey = ['strategies'] as const
 const strategyKey = (id: string) => ['strategies', id] as const
+
+// Módulo-nivel "base de datos" mock: seedeada desde mock-data.ts y mutada por `useCreateStrategy` para
+// que una estrategia recién creada aparezca en la lista y tenga detalle, siguiendo el mismo patrón de
+// `itemsStore` en `venado-money/api/usePointsItems.ts`.
+let strategiesStore: StrategySummary[] = [...mockStrategySummaries]
+let strategyDetailsStore: Record<string, StrategyDetail> = { ...mockStrategyDetails }
 
 async function fakeDelay<T>(value: T, ms = 300): Promise<T> {
   await new Promise((resolve) => setTimeout(resolve, ms))
@@ -13,14 +30,14 @@ async function fakeDelay<T>(value: T, ms = 300): Promise<T> {
 export function useStrategies() {
   return useQuery({
     queryKey: strategiesKey,
-    queryFn: () => fakeDelay(mockStrategySummaries),
+    queryFn: () => fakeDelay(strategiesStore),
   })
 }
 
 export function useStrategy(id: string | undefined) {
   return useQuery({
     queryKey: strategyKey(id ?? ''),
-    queryFn: () => fakeDelay(id ? mockStrategyDetails[id] : undefined),
+    queryFn: () => fakeDelay(id ? strategyDetailsStore[id] : undefined),
     enabled: !!id,
   })
 }
@@ -125,11 +142,90 @@ export function useTargetClients(filters: TargetClientFilters) {
   })
 }
 
+/** Mismo cálculo de "clientes mostrados" que `useDisplayedTargetClients` (candidatos +/- exclusiones/agregados a mano), pero como función pura para poder correrlo al crear la estrategia, fuera de un componente. */
+function resolveTargetClients(data: StrategyWizardData): TargetClient[] {
+  const baseFilters = { city: data.city, channel: data.channel, subchannel: data.subchannel, conditions: data.conditions }
+  const candidatePool = filterTargetClients(baseFilters)
+  const autoOrPolygonClients = filterTargetClients({ ...baseFilters, selectedClientIds: data.selectedClientIds })
+
+  const excluded = new Set(data.excludedClientIds)
+  const list = autoOrPolygonClients.filter((client) => !excluded.has(client.id))
+
+  const presentIds = new Set(list.map((client) => client.id))
+  for (const id of data.manuallyAddedClientIds) {
+    if (presentIds.has(id)) continue
+    const client = candidatePool.find((c) => c.id === id)
+    if (client) {
+      list.push(client)
+      presentIds.add(id)
+    }
+  }
+
+  return list
+}
+
+/** Arma el resumen (para la lista) y el detalle de una estrategia recién creada a partir de los datos del wizard. */
+function buildStrategyFromWizardData(data: StrategyWizardData): { summary: StrategySummary; detail: StrategyDetail } {
+  const id = crypto.randomUUID()
+  const targetClients = resolveTargetClients(data)
+  const objectiveLabel = objectiveLabels[data.objective ?? StrategyObjective.Other]
+
+  const segmentParts = [
+    cityOptions.find((option) => option.value === data.city)?.label,
+    channelOptions.find((option) => option.value === data.channel)?.label,
+  ].filter((part): part is string => !!part)
+  const segmentLabel = segmentParts.length > 0 ? segmentParts.join(' · ') : `${targetClients.length} clientes objetivo`
+
+  const summary: StrategySummary = {
+    id,
+    name: data.name,
+    status: StrategyStatus.Active,
+    objectiveLabel,
+    segmentLabel,
+    // La estrategia recién nace: aún no hay resultados reales, así que el impacto proyectado es la meta
+    // que se fijó en el paso "KPI/Meta" del wizard, y el progreso arranca en 0%.
+    projectedImpactPercent: data.metaPercent,
+    progressPercent: 0,
+  }
+
+  const detail: StrategyDetail = {
+    id,
+    name: data.name,
+    status: StrategyStatus.Active,
+    dateRangeLabel: `${formatDate(data.startDate)} - ${formatDate(data.endDate)}`,
+    objectiveDescription: data.description || objectiveLabel,
+    metrics: {
+      clientesObjetivo: targetClients.length,
+      contactados: 0,
+      reactivados: 0,
+      tasaRecompra: 0,
+      ventasAtribuibles: 0,
+      ganancia: 0,
+      roi: 0,
+      venadoMoneyGenerado: 0,
+    },
+    impactChart: [
+      { label: 'Antes (Promedio 3m)', value: 100 },
+      { label: 'Después (Mes actual)', value: 100 },
+    ],
+    impactDeltaPercent: 0,
+    impactNote: 'La estrategia se acaba de activar: el impacto se medirá con la actividad de los próximos días.',
+  }
+
+  return { summary, detail }
+}
+
 export function useCreateStrategy() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: StrategyWizardData) => fakeDelay({ id: crypto.randomUUID(), ...data }, 500),
+    mutationFn: (data: StrategyWizardData) =>
+      fakeDelay(null, 500).then(() => {
+        const { summary, detail } = buildStrategyFromWizardData(data)
+        strategiesStore = [summary, ...strategiesStore]
+        strategyDetailsStore = { ...strategyDetailsStore, [detail.id]: detail }
+        return summary
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: strategiesKey })
     },
