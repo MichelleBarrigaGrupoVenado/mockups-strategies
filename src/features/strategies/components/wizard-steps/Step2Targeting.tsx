@@ -99,8 +99,8 @@ export function Step2Targeting() {
           Georreferencia
         </div>
         <p className="-mt-2 text-sm text-muted-foreground">
-          Clientes que cumplen la ciudad, canal, subcanal y condiciones definidas. Dibuja un polígono en el mapa para elegir un grupo específico a
-          mano.
+          Clientes que cumplen la ciudad, canal, subcanal y condiciones definidas. Selecciona uno o varios mercados y/o dibuja uno o más polígonos
+          en el mapa para elegir un grupo específico a mano.
         </p>
 
         <ClientsMap clients={displayedClients} className="h-64 w-full overflow-hidden rounded-lg ring-1 ring-border" />

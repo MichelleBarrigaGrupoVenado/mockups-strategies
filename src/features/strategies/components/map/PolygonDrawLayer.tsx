@@ -5,24 +5,40 @@ import { useEffect, useRef } from 'react'
 import { useMap } from 'react-leaflet'
 
 interface PolygonDrawLayerProps {
-  onPolygonChange: (points: { lat: number; lng: number }[] | null) => void
+  /** Se dispara con el listado completo de polígonos activos cada vez que se crea, edita o borra uno. */
+  onPolygonsChange: (polygons: { lat: number; lng: number }[][]) => void
+  /** Se dispara justo antes de que Geoman manipule su DOM (crear/editar/borrar), para que el padre pueda
+   *  blindar temporalmente cualquier cierre disparado por esa mutación (ver SelectClientsMapDialog). */
+  onBusy?: () => void
 }
 
-/** Habilita el control de dibujo de Geoman (solo polígono) y expone sus vértices al padre. */
-export function PolygonDrawLayer({ onPolygonChange }: PolygonDrawLayerProps) {
+/** Habilita el control de dibujo de Geoman (polígono, con múltiples formas activas a la vez) y expone
+ *  sus vértices al padre. */
+export function PolygonDrawLayer({ onPolygonsChange, onBusy }: PolygonDrawLayerProps) {
   const map = useMap()
-  const currentLayerRef = useRef<Layer | null>(null)
+  const layersRef = useRef<Map<Layer, { lat: number; lng: number }[]>>(new Map())
 
-  // Ref para la última versión del callback: si el efecto de abajo dependiera de `onPolygonChange`
+  // Refs para la última versión de los callbacks: si el efecto de abajo dependiera de ellos
   // directamente, cada vértice dibujado (que dispara un cambio de estado en el padre y por lo tanto
   // una nueva identidad de función) volvería a montar los controles de Geoman a mitad del dibujo,
   // cancelando la forma en curso.
-  const onPolygonChangeRef = useRef(onPolygonChange)
+  const onPolygonsChangeRef = useRef(onPolygonsChange)
   useEffect(() => {
-    onPolygonChangeRef.current = onPolygonChange
-  }, [onPolygonChange])
+    onPolygonsChangeRef.current = onPolygonsChange
+  }, [onPolygonsChange])
+  const onBusyRef = useRef(onBusy)
+  useEffect(() => {
+    onBusyRef.current = onBusy
+  }, [onBusy])
 
   useEffect(() => {
+    // Referencia estable al mismo Map durante todo el ciclo de vida del efecto (layersRef nunca se
+    // reasigna), capturada acá para que el cleanup no tenga que leer `.current` directamente.
+    const layers = layersRef.current
+
+    // `continueDrawing` deja la herramienta de polígono activa después de cerrar cada forma, así se
+    // pueden dibujar varios polígonos seguidos sin volver a apretar el botón de la barra.
+    map.pm.setGlobalOptions({ continueDrawing: true })
     map.pm.removeControls()
     map.pm.addControls({
       position: 'topleft',
@@ -40,37 +56,36 @@ export function PolygonDrawLayer({ onPolygonChange }: PolygonDrawLayerProps) {
       rotateMode: false,
     })
 
-    function clearCurrentLayer() {
-      if (currentLayerRef.current) {
-        map.removeLayer(currentLayerRef.current)
-        currentLayerRef.current = null
-      }
+    function emitAll() {
+      onPolygonsChangeRef.current(Array.from(layersRef.current.values()))
     }
 
     function handleCreate(e: { layer: Layer }) {
-      // Solo un polígono activo a la vez: uno nuevo reemplaza al anterior.
-      clearCurrentLayer()
-      currentLayerRef.current = e.layer
+      onBusyRef.current?.()
 
-      const polygonLayer = e.layer as unknown as { getLatLngs: () => { lat: number; lng: number }[][] }
+      const layer = e.layer
+      const polygonLayer = layer as unknown as { getLatLngs: () => { lat: number; lng: number }[][] }
       const rawPoints = polygonLayer.getLatLngs()[0]
-      const points = rawPoints.map((p) => ({ lat: p.lat, lng: p.lng }))
+      layersRef.current.set(layer, rawPoints.map((p) => ({ lat: p.lat, lng: p.lng })))
+
       // Geoman todavía está a mitad de su propio manejador de click (convirtiendo los marcadores de
       // edición en un path estático) cuando dispara `pm:create`. Si el callback re-renderiza React de
-      // forma síncrona acá adentro (por ejemplo cerrando el diálogo que contiene este mismo mapa),
-      // Geoman se queda manipulando nodos que ya no existen. Se difiere al siguiente tick para dejarlo
-      // terminar primero.
-      setTimeout(() => onPolygonChangeRef.current(points), 0)
+      // forma síncrona acá adentro, Geoman se queda manipulando nodos que ya no existen. Se difiere al
+      // siguiente tick para dejarlo terminar primero.
+      setTimeout(emitAll, 0)
 
-      e.layer.on('pm:edit', () => {
+      layer.on('pm:edit', () => {
+        onBusyRef.current?.()
         const updated = polygonLayer.getLatLngs()[0]
-        onPolygonChangeRef.current(updated.map((p) => ({ lat: p.lat, lng: p.lng })))
+        layersRef.current.set(layer, updated.map((p) => ({ lat: p.lat, lng: p.lng })))
+        emitAll()
       })
     }
 
-    function handleRemove() {
-      currentLayerRef.current = null
-      setTimeout(() => onPolygonChangeRef.current(null), 0)
+    function handleRemove(e: { layer: Layer }) {
+      onBusyRef.current?.()
+      layersRef.current.delete(e.layer)
+      setTimeout(emitAll, 0)
     }
 
     map.on('pm:create', handleCreate)
@@ -80,7 +95,8 @@ export function PolygonDrawLayer({ onPolygonChange }: PolygonDrawLayerProps) {
       map.off('pm:create', handleCreate)
       map.off('pm:remove', handleRemove)
       map.pm.removeControls()
-      clearCurrentLayer()
+      layers.forEach((_points, layer) => map.removeLayer(layer))
+      layers.clear()
     }
   }, [map])
 
