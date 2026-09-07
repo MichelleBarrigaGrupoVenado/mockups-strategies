@@ -36,3 +36,36 @@ export function firstOfNextMonthIso(): string {
 export function formatFrequency(meses: number): string {
   return `${meses}m`
 }
+
+/** Monto en Bs con dos decimales al estilo es-BO, ej. `6840` -> `"Bs 6.840,00"`. */
+export function formatBsAmount(value: number): string {
+  return `Bs ${new Intl.NumberFormat('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value)}`
+}
+
+/** Puntos con separador de miles y sufijo, ej. `125000` -> `"125.000 pts"`. */
+export function formatPoints(value: number): string {
+  return `${new Intl.NumberFormat('es-BO').format(value)} pts`
+}
+
+/** Puntos abreviados para leyendas, ej. `125000` -> `"125k pts"`. */
+export function formatPointsShort(value: number): string {
+  if (Math.abs(value) < 1000) return `${value} pts`
+  const thousands = value / 1000
+  const rounded = Math.round(thousands * 10) / 10
+  return `${new Intl.NumberFormat('es-BO').format(rounded)}k pts`
+}
+
+/** Porcentaje con decimales al estilo es-BO, ej. `66` -> `"66,0%"`. */
+export function formatPercentDecimal(value: number, digits = 1): string {
+  return `${new Intl.NumberFormat('es-BO', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value)}%`
+}
+
+/** Cantidad entera con separador de miles al estilo es-BO, ej. `1253` -> `"1.253"`. */
+export function formatCount(value: number): string {
+  return new Intl.NumberFormat('es-BO').format(value)
+}
+
+/** Número decimal al estilo es-BO, ej. `8.4` -> `"8,4"`. */
+export function formatDecimal(value: number, digits = 1): string {
+  return new Intl.NumberFormat('es-BO', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value)
+}

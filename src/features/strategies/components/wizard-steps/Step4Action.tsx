@@ -47,14 +47,14 @@ const actionOptions = [
   {
     value: ActionType.OfferEmployeePoints,
     icon: Coins,
-    title: 'Ofrecer puntos al Empleado',
+    title: 'Ofrecer puntos al Vendedor',
     description:
       'Otorga puntos Venado Money como incentivo al cumplir el objetivo.',
   },
   {
     value: ActionType.OfferPriceRule,
     icon: Tag,
-    title: 'Ofrecer regla de precios',
+    title: 'Cargar regla de precios',
     description:
       'Otorga una regla de precios al cliente al cumplir su objetivo.',
   },

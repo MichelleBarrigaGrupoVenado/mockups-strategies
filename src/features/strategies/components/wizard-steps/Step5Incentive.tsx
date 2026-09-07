@@ -702,25 +702,25 @@ export function Step5Incentive() {
         </div>
       )}
 
-      {/* EMPLEADOS — solo aparece si se eligió "Ofrecer puntos al Empleado" en el paso 4 (Acción). */}
+      {/* EMPLEADOS — solo aparece si se eligió "Ofrecer puntos al Vendedor" en el paso 4 (Acción). */}
       {data.actionTypes.includes(ActionType.OfferEmployeePoints) && (
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
           <div className="flex flex-col gap-0.5">
             <span className="text-base font-semibold text-foreground">
-              Venado Money para Empleados
+              Venado Money para Vendedores
             </span>
 
             <span className="text-sm text-muted-foreground">
-              Habilitado porque seleccionaste "Ofrecer puntos al Empleado" en el paso anterior.
+              Habilitado porque seleccionaste "Ofrecer puntos al Vendedor" en el paso anterior.
             </span>
           </div>
 
           <span className="text-sm font-semibold text-foreground">
-            Nivel de Cumplimiento para Empleado
+            Nivel de Cumplimiento para Vendedor
           </span>
 
           <span className="-mt-2 text-xs text-muted-foreground">
-            El cumplimiento del empleado se evalúa siempre al 100% de la meta; solo se define cuántos puntos gana al alcanzarla.
+            El cumplimiento del Vendedor se evalúa siempre al 100% de la meta; solo se define cuántos puntos gana al alcanzarla.
           </span>
 
           <div className="overflow-hidden rounded-lg border border-border">

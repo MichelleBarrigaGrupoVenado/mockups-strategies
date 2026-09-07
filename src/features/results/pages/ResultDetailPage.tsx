@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useResultStrategyDetail } from '@/features/results/api/useResults'
 import { ABTestTab } from '@/features/results/components/ABTestTab'
 import { BeforeAfterTab } from '@/features/results/components/BeforeAfterTab'
+import { IncentivesTab } from '@/features/results/components/IncentivesTab'
 import { StatisticalModelTab } from '@/features/results/components/StatisticalModelTab'
 import { StatusBadge } from '@/features/strategies/components/StatusBadge'
 
@@ -66,6 +67,7 @@ export function ResultDetailPage() {
           <TabsTrigger value="before-after">Antes y Después</TabsTrigger>
           <TabsTrigger value="ab-test">A/B Test</TabsTrigger>
           <TabsTrigger value="statistical-model">Modelo Estadístico</TabsTrigger>
+          <TabsTrigger value="incentives">Incentivos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="before-after" className="pt-4">
@@ -76,6 +78,9 @@ export function ResultDetailPage() {
         </TabsContent>
         <TabsContent value="statistical-model" className="pt-4">
           <StatisticalModelTab data={result.statisticalModel} />
+        </TabsContent>
+        <TabsContent value="incentives" className="pt-4">
+          <IncentivesTab data={result.incentives} />
         </TabsContent>
       </Tabs>
     </div>

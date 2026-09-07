@@ -1,4 +1,5 @@
 import { StrategyStatus } from '@/features/strategies/types'
+import { portafolioIncentives, zonaNorteIncentives } from '@/features/results/data/incentives-mock-data'
 import type { FinancialBreakdownRow, ResultStrategyDetail, ResultStrategySummary } from '@/features/results/types'
 
 export const mockResultSummaries: ResultStrategySummary[] = [
@@ -110,6 +111,7 @@ export const mockResultDetails: Record<string, ResultStrategyDetail> = {
       byProduct: zonaNorteByProduct,
       summary: { revenueBs: 182500, costBs: 110000, attributableBenefitBs: 72500 },
     },
+    incentives: zonaNorteIncentives,
   },
   'incremento-de-portafolio': {
     id: 'incremento-de-portafolio',
@@ -158,5 +160,6 @@ export const mockResultDetails: Record<string, ResultStrategyDetail> = {
       byProduct: portafolioByProduct,
       summary: { revenueBs: 118400, costBs: 77200, attributableBenefitBs: 41200 },
     },
+    incentives: portafolioIncentives,
   },
 }
