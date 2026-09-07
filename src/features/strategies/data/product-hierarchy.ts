@@ -22,7 +22,18 @@ const brands: ProductRefItem[] = [
   { id: 'br-2', parentId: 'ch-2', name: 'MARCAS BEBIDAS Y LACTEOS' },
   { id: 'br-3', parentId: 'ch-3', name: 'MARCAS CUIDADO PERSONAL Y DEL HOGAR' },
   { id: 'br-4', parentId: 'ch-4', name: 'MARCAS PANIFICACION' },
-  { id: 'br-5', parentId: 'ch-5', name: 'MARCAS SALSAS' },
+  { id: 'br-5', parentId: 'ch-5', name: 'KRIS' },
+  { id: 'br-6', parentId: 'ch-1', name: 'REAL' },
+  { id: 'br-5', parentId: 'ch-1', name: 'EL PESCADOR' },
+  { id: 'br-7', parentId: 'ch-2', name: 'DE LA GRANJA' },
+  { id: 'br-8', parentId: 'ch-2', name: 'CASA DEL CAMBA' },
+  { id: 'br-9', parentId: 'ch-2', name: 'FRUSSION' },
+  { id: 'br-10', parentId: 'ch-2', name: 'RAPTOR' },
+  { id: 'br-11', parentId: 'ch-2', name: 'REVIVE' },
+  { id: 'br-12', parentId: 'ch-2', name: 'SPERANZA' },
+  { id: 'br-13', parentId: 'ch-3', name: 'BRISTAR' },
+  { id: 'br-14', parentId: 'ch-3', name: 'PULPIN' },
+  { id: 'br-15', parentId: 'ch-3', name: 'SHABAY' },
 ]
 
 /** product_categories_ref (brand_id) */
@@ -31,7 +42,9 @@ const categories: ProductRefItem[] = [
   { id: 'ca-2', parentId: 'br-2', name: 'CATEGORIA BEBIDAS Y LACTEOS' },
   { id: 'ca-3', parentId: 'br-3', name: 'CATEGORIA CUIDADO PERSONAL Y DEL HOGAR' },
   { id: 'ca-4', parentId: 'br-4', name: 'CATEGORIA PANIFICACION' },
-  { id: 'ca-5', parentId: 'br-5', name: 'CATEGORIA SALSAS' },
+  { id: 'ca-5', parentId: 'br-5', name: 'CEREALES' },
+  { id: 'ca-6', parentId: 'br-5', name: 'POSTRES EN POLVO' },
+  { id: 'ca-7', parentId: 'br-5', name: 'GELATINA NEUTRA' },
 ]
 
 /** product_groups_ref (category_id) */
@@ -41,6 +54,10 @@ const groups: ProductRefItem[] = [
   { id: 'gr-3', parentId: 'ca-3', name: 'GRUPO CUIDADO PERSONAL Y DEL HOGAR' },
   { id: 'gr-4', parentId: 'ca-4', name: 'GRUPO PANIFICACION' },
   { id: 'gr-5', parentId: 'ca-5', name: 'GRUPO SALSAS' },
+  { id: 'gr-6', parentId: 'ca-6', name: 'POSTRES' }, 
+  { id: 'gr-7', parentId: 'ca-6', name: 'BEBIDAS EN POLVO' },
+  { id: 'gr-8', parentId: 'ca-7', name: 'CULINARIOS - HOGAR' },
+  { id: 'gr-9', parentId: 'ca-7', name: 'CULINARIOS - NEGOCIO' },
 ]
 
 /** product_families_ref (group_id) */
@@ -75,6 +92,10 @@ const families: ProductRefItem[] = [
   { id: 'fa-28', parentId: 'gr-5', name: 'SALSAS CRIOLLAS Y PICANTES' },
   { id: 'fa-29', parentId: 'gr-5', name: 'SALSA BARBACOA' },
   { id: 'fa-30', parentId: 'gr-5', name: 'EXTRACTO Y SALSA DE TOMATE' },
+  { id: 'fa-31', parentId: 'gr-6', name: 'FLAN EN POLVO' },
+  { id: 'fa-32', parentId: 'gr-6', name: 'GELATINA SABORIZADA EN POLVO' },
+  { id: 'fa-33', parentId: 'gr-6', name: 'MIL SHAKE EN POLVO' },
+  { id: 'fa-34', parentId: 'gr-6', name: 'PUDÍN EN POLVO' },
 ]
 
 /** product_ref (family_id) — nivel final, ejemplo de SKUs por familia */
@@ -100,6 +121,20 @@ const products: ProductRefItem[] = [
   { id: 'pr-19', parentId: 'fa-25', name: 'Mayonesa Original 400g' },
   { id: 'pr-20', parentId: 'fa-26', name: 'Mostaza Clásica 200g' },
   { id: 'pr-21', parentId: 'fa-30', name: 'Salsa de Tomate 400g' },
+  { id: 'pr-21', parentId: 'fa-31', name: 'FLAN DULCE DE LECHE 60 g' },
+  { id: 'pr-22', parentId: 'fa-31', name: 'FLAN DULCE DE LECHE 60 g' },
+  { id: 'pr-23', parentId: 'fa-31', name: 'FLAN VAINILLA BOLSA 1 kg' },
+  { id: 'pr-24', parentId: 'fa-31', name: 'FLAN VAINILLA 60 g' },
+  { id: 'pr-25', parentId: 'fa-32', name: 'GELATINA FRUTILLA 250 G' },
+  { id: 'pr-26', parentId: 'fa-32', name: 'GELATINA CEREZA 250 G' },
+  { id: 'pr-27', parentId: 'fa-32', name: 'SURTIDO DE GELATINAS 250 G' },
+  { id: 'pr-28', parentId: 'fa-33', name: 'MILK SHAKE CHOCOLATE' },
+  { id: 'pr-29', parentId: 'fa-33', name: 'MILK SHAKE COCO' },
+  { id: 'pr-30', parentId: 'fa-33', name: 'MILK SHAKE FRUTILLA' },
+  { id: 'pr-31', parentId: 'fa-33', name: 'MILK SHAKE MORA' },
+  { id: 'pr-32', parentId: 'fa-34', name: 'PUDIN FRUTILLA KRIS 60 G' },
+  { id: 'pr-33', parentId: 'fa-34', name: 'PUDIN CHOCOLATE KRIS 60 G' },
+  { id: 'pr-34', parentId: 'fa-34', name: 'PUDIN VAINILLA KRIS 60 G' },
 ]
 
 export const productLevelOptions: { value: ProductLevel; label: string }[] = [
