@@ -26,7 +26,7 @@ export function Step3Kpi() {
   }
 
   const getMeta = (client: (typeof displayedClients)[number]) => {
-    return metaOverrides[client.id] ?? calculateMeta(client.ticketPromedio, data.metaPercent)
+    return metaOverrides[client.id] ?? calculateMeta(client.ticketPromedioSegmento, data.metaPercent)
   }
 
   const updateClientMeta = (clientId: string, value: string) => {

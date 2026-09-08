@@ -8,9 +8,10 @@ export function formatPercent(value: number, { withSign = false } = {}): string 
 }
 
 export function formatDate(iso: string): string {
-  return new Intl.DateTimeFormat('es-BO', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(
-    new Date(iso)
-  )
+  // Un `yyyy-mm-dd` se parsea como medianoche UTC y en Bolivia (UTC-4) se mostraría el día anterior:
+  // se lo fuerza a medianoche local. Los timestamps completos ya traen su zona y se dejan como vienen.
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(`${iso}T00:00:00`) : new Date(iso)
+  return new Intl.DateTimeFormat('es-BO', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date)
 }
 
 /** Fecha de hoy en formato `yyyy-mm-dd`, lista para un `<input type="date">`. */

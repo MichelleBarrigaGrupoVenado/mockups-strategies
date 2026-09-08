@@ -14,6 +14,7 @@ import {
   NativeSelectOption,
 } from '@/components/ui/native-select'
 
+import { PointsExpirationField } from '@/features/strategies/components/PointsExpirationField'
 import { useWizardStore } from '@/features/strategies/store/useWizardStore'
 import {
   ActionType,
@@ -645,60 +646,19 @@ export function Step5Incentive() {
           )}
 
           {/* VIGENCIA */}
-          <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium text-foreground">
-              Vigencia de los puntos
-            </span>
-
-            <RadioGroup
-              className="flex flex-row gap-6"
-              value={data.pointsExpire ? 'con-vencimiento' : 'sin-vencimiento'}
-              onValueChange={(value) => {
-                const hasExpiration = value === 'con-vencimiento'
-
-                update({
-                  pointsExpire: hasExpiration,
-                  pointsExpirationDate: hasExpiration
-                    ? data.pointsExpirationDate
-                    : undefined,
-                })
-              }}
-            >
-              <Label className="flex items-center gap-2 text-sm font-normal">
-                <RadioGroupItem value="sin-vencimiento" />
-                Sin vencimiento
-              </Label>
-
-              <Label className="flex items-center gap-2 text-sm font-normal">
-                <RadioGroupItem value="con-vencimiento" />
-                Con fecha de vencimiento
-              </Label>
-              {data.pointsExpire && (
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="pointsExpirationDate">
-                    Fecha de vencimiento
-                  </Label>
-
-                  <Input
-                    id="pointsExpirationDate"
-                    type="date"
-                    value={data.pointsExpirationDate ?? ''}
-                    min={new Date().toISOString().split('T')[0]}
-                    onChange={(e) =>
-                      update({
-                        pointsExpirationDate: e.target.value,
-                      })
-                    }
-                    className="w-fit"
-                  />
-
-                  <span className="text-xs text-muted-foreground">
-                    Los puntos generados por esta estrategia vencerán en esta fecha.
-                  </span>
-                </div>
-              )}
-            </RadioGroup>
-          </div>
+          <PointsExpirationField
+            title="Vigencia de los puntos"
+            expires={data.pointsExpire}
+            months={data.pointsExpirationMonths}
+            startDate={data.startDate}
+            subject="generados por esta estrategia"
+            onChange={({ pointsExpire, months }) =>
+              update({
+                pointsExpire,
+                pointsExpirationMonths: months,
+              })
+            }
+          />
         </div>
       )}
 
@@ -778,6 +738,21 @@ export function Step5Incentive() {
               </tbody>
             </table>
           </div>
+
+          {/* VIGENCIA — independiente de la de los puntos del cliente. */}
+          <PointsExpirationField
+            title="Vigencia de los puntos del Vendedor"
+            expires={data.employeePointsExpire}
+            months={data.employeePointsExpirationMonths}
+            startDate={data.startDate}
+            subject="ganados por el Vendedor"
+            onChange={({ pointsExpire, months }) =>
+              update({
+                employeePointsExpire: pointsExpire,
+                employeePointsExpirationMonths: months,
+              })
+            }
+          />
         </div>
       )}
 

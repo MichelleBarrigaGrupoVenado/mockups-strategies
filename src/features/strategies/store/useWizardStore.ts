@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { createDefaultCondition } from '@/features/strategies/data/condition-fields'
-import { ActionType, ClientIncentiveType, ConditionJoin, ConditionOperator, type StrategyWizardData, type TargetingCondition } from '@/features/strategies/types'
+import { ActionType, ClientIncentiveType, ConditionJoin, ConditionOperator, PointsExpirationMonths, type StrategyWizardData, type TargetingCondition } from '@/features/strategies/types'
 import { addMonthsIso, firstOfNextMonthIso } from '@/shared/utils/format'
 
 const defaultStartDate = firstOfNextMonthIso()
@@ -46,9 +46,12 @@ const initialData: StrategyWizardData = {
   ],
   productPointsRules: [],
   pointsExpire: false,
+  pointsExpirationMonths: PointsExpirationMonths.ThreeMonths,
   // Mismo criterio que `clientIncentiveEnabled`: se habilita al elegir "Ofrecer puntos al Empleado" en el paso 4.
   employeeIncentiveEnabled: false,
   complianceRules: [{ id: crypto.randomUUID(), percent: 100, points: 0 }],
+  employeePointsExpire: false,
+  employeePointsExpirationMonths: PointsExpirationMonths.ThreeMonths,
   priceRuleIncentiveEnabled: false,
   priceRule: null,
 }

@@ -97,6 +97,17 @@ export const ProductUnitType = {
 export type ProductUnitType =
   (typeof ProductUnitType)[keyof typeof ProductUnitType]
 
+/** Plazos de vencimiento ofrecidos para los puntos, en meses desde el inicio de la estrategia. */
+export const PointsExpirationMonths = {
+  OneMonth: 1,
+  ThreeMonths: 3,
+  SixMonths: 6,
+  TwelveMonths: 12,
+} as const
+
+export type PointsExpirationMonths =
+  (typeof PointsExpirationMonths)[keyof typeof PointsExpirationMonths]
+
 export interface ProductPointsRule {
   id: string
   productId: string
@@ -151,9 +162,13 @@ export interface StrategyWizardData {
   clientComplianceRules: ComplianceRule[]
   productPointsRules: ProductPointsRule[]
   pointsExpire: boolean
-  pointsExpirationDate?: string
+  /** Plazo elegido cuando `pointsExpire` es `true`; la fecha se deriva de `startDate`. */
+  pointsExpirationMonths: PointsExpirationMonths
   employeeIncentiveEnabled: boolean
   complianceRules: ComplianceRule[]
+  /** Vigencia de los puntos del Vendedor, independiente de la de los puntos del cliente. */
+  employeePointsExpire: boolean
+  employeePointsExpirationMonths: PointsExpirationMonths
   priceRuleIncentiveEnabled: boolean
   /** Regla de precios creada desde el paso 5 (`CreatePriceRulePage`); `null` = todavía no se creó ninguna. */
   priceRule: PriceRuleDraft | null
